@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025大阪楓年祭散策旅圖</title>
+    <!-- 載入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 載入 Noto Serif TC (明體) 字體 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* 設定主要字體為明體，並加入優雅的襯線字體作為備用 */
+        body {
+            font-family: 'Noto Serif TC', 'Georgia', 'Times New Roman', Times, serif;
+            color: #333;
+            overflow-x: hidden; /* 防止滾動條 */
+            /* 楓葉色漸層背景動畫 */
+            background: linear-gradient(45deg, #fcf8f3, #fff5eb, #fff0e6, #fcece6);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* 楓葉飄落特效的 CSS */
+        .maple-fall-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .maple-leaf {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #e53e3e; /* 楓葉紅 */
+            clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%); /* 簡單的五角形楓葉形狀 */
+            opacity: 0;
+            /* 動畫名稱將由 JS 動態指定 */
+        }
+
+        /* 大標題動態效果 */
+        .animated-title {
+            animation: titleFloat 6s ease-in-out infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(90deg, #b91c1c, #c2410c, #b91c1c);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 5s linear infinite, titleFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+        /* 紅框閃爍特效 */
+        @keyframes flash {
+            0%, 100% { border-color: #e53e3e; box-shadow: 0 0 10px rgba(229, 62, 62, 0.8); }
+            50% { border-color: #f6e05e; box-shadow: 0 0 20px rgba(246, 224, 94, 0.9); }
+        }
+
+        .flashing-border {
+            border: 3px solid transparent;
+            animation: flash 1.5s infinite alternate;
+        }
+
+        /* 交通卡片專屬樣式 */
+        .transport-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            padding: 1rem; /* 增加內邊距 */
+            border-radius: 0.75rem; /* 圓角 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 輕微陰影 */
+        }
+
+        .transport-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(229, 62, 62, 0.15);
+        }
+        
+        /* 飛機卡片專屬樣式 */
+        .flight-card {
+            border-left: 5px solid #e53e3e;
+        }
+
+        .transport-line {
+            position: relative;
+            height: 2px;
+            background-color: #e53e3e;
+            margin-top: 10px;
+            flex-grow: 1;
+        }
+
+        /* 交通線路黃色標籤 */
+        .transport-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background-color: #f6e05e; /* 亮黃色背景 */
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 90%; 
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        /* ----------------------- 頂部導航欄 (Side Menu) ----------------------- */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            /* 橫向導航列變更 */
+            width: 100%; 
+            height: auto; 
+            padding: 0.5rem 1rem; /* 原始 padding */
+            
+            /* 背景透明度調整為 90% 確保文字清晰可讀 */
+            background-color: rgba(255, 255, 255, 0.9); 
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            
+            display: flex;
+            flex-direction: row; /* 橫向排列 */
+            align-items: center;
+            
+            transition: all 0.3s ease; /* 確保所有屬性變化平滑 */
+            overflow-x: auto; /* 允許水平滾動 */
+            overflow-y: hidden;
+            z-index: 50;
+            border-right: none; /* 移除垂直邊線 */
+            border-bottom: 1px solid rgba(229, 62, 62, 0.1); /* 新增底部分隔線 */
+        }
+
+        /* 滾動時的緊湊狀態 (讓頂部導航欄「伸縮自如」) */
+        #sidebar.compact {
+            /* 【修正】將 padding 設為極小，讓它縮到最小 */
+            padding-top: 0.1rem;
+            padding-bottom: 0.1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 稍微增加陰影讓它看起來更貼合 */
+            /* 【新增】水平置中 */
+            justify-content: center;
+        }
+
+        /* 橫向滾動條樣式 (美化) */
+        #sidebar::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        #sidebar::-webkit-scrollbar-thumb {
+            background-color: #fca5a5; 
+            border-radius: 3px;
+        }
+        
+        #sidebar:hover {
+            width: 100%; /* 移除不必要的 hover 寬度變化 */
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem; /* 調整為橫向選項的內距 */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            /* 將指示條改為底部 */
+            border-left: none; 
+            border-bottom: 4px solid transparent; 
+            margin-right: 0.75rem; /* 項目間隔 */
+            margin-bottom: 0;
+        }
+
+        /* 滾動緊湊時，項目內邊距也跟著調整 */
+        #sidebar.compact .sidebar-item {
+            /* 【修正】讓項目內邊距也跟著縮小 */
+            padding: 0.3rem 0.5rem; /* 讓左右更緊湊 */
+        }
+
+        .sidebar-item:hover {
+            background-color: #fff7ed; /* 淺橘色背景 */
+            border-left-color: transparent;
+            border-bottom-color: #fdba74; /* 底部指示條 Hover 顏色 */
+        }
+
+        .sidebar-item.active {
+            background-color: #fff1f2; /* 淺紅色背景 */
+            border-left-color: transparent; 
+            border-bottom-color: #e53e3e; /* 底部指示條 Active 顏色 */
+        }
+
+        .sidebar-icon-container {
+            min-width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem; /* 縮短圖示與文字的距離 */
+            border-radius: 50%;
+            background-color: #f3f4f6;
+            transition: background-color 0.3s;
+        }
+
+        /* 滾動時，移除 ICON 旁邊的空間 */
+        #sidebar.compact .sidebar-icon-container {
+            margin-right: 0; 
+        }
+        
+        /* 橫向導航時，文字應始終顯示 */
+        .sidebar-text {
+            opacity: 1; 
+            transform: translateX(0);
+            /* 【修正】讓文字可以平滑隱藏/顯示 */
+            transition: all 0.3s ease; 
+            display: flex;
+            flex-direction: column;
+            min-width: 5rem; /* 確保在正常模式下有足夠寬度 */
+        }
+
+        /* 【新增】滾動時，徹底隱藏文字並移除佔用寬度 */
+        #sidebar.compact .sidebar-text {
+            opacity: 0;
+            width: 0; 
+            min-width: 0; /* 覆蓋正常模式的 min-width */
+            overflow: hidden;
+            padding: 0;
+            pointer-events: none; /* 防止點擊隱藏文字區域 */
+        }
+
+        /* ----------------------- 主內容佈局調整 ----------------------- */
+        .main-container {
+            /* 移除左邊距，改為頂部填充，避開固定導航列 */
+            margin-left: 0; 
+            padding-top: 6rem; /* 留出 6rem 空間給頂部導航列 */
+            transition: none; /* 移除邊距動畫 */
+            min-height: 100vh;
+            /* 讓內容從頂部開始排列，而非垂直置中 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start; 
+            
+            padding-bottom: 4rem; /* 確保底部有足夠空間 */
+        }
+        
+        /* ----------------------- 行程內容區 ----------------------- */
+        #itinerary-content {
+            width: 100%;
+            max-width: 56rem; /* max-w-4xl */
+            /* 維持 75% 透明度 */
+            background-color: rgba(255, 255, 255, 0.75); 
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+            margin-top: 2rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            display: none; /* 讓 JS 完全控制顯隱 */
+        }
+
+        #itinerary-content.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        /* ----------------------- 路線圖樣式 (Timeline) ----------------------- */
+        .timeline-container {
+            position: relative;
+            margin-top: 2rem;
+        }
+
+        /* 垂直連接線 */
+        .timeline-line {
+            position: absolute;
+            left: 23px; /* 調整以對齊圖示中心 (圖示寬約 48px) */
+            top: 24px; 
+            width: 2px;
+            background-color: #fed7aa; 
+            z-index: 0;
+        }
+
+        /* 單一行程項目容器 */
+        .timeline-item {
+            position: relative;
+            padding-left: 4.5rem; 
+            padding-bottom: 2.5rem; 
+            min-height: 6rem;
+        }
+        
+        /* 圖示容器 */
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3rem; 
+            height: 3rem; 
+            background-color: white;
+            border-radius: 1rem;
+            border: 2px solid #fed7aa; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10; 
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .timeline-item:hover .timeline-icon {
+            transform: scale(1.1) rotate(-5deg);
+            border-color: #fca5a5; /* Hover red border */
+        }
+
+        /* 讓內容卡片與圖示對齊 */
+        .timeline-content-card {
+            width: 100%;
+            transition: all 0.3s ease;
+            position: relative; /* 為了讓內部的時間絕對定位 */
+            overflow: visible; /* 允許時間標籤突出 */
+        }
+
+        /* 讓時間顯示在卡片左上角，壓在邊框上 */
+        .timeline-time-box {
+            position: absolute;
+            top: -0.85rem; /* 向上移動以覆蓋邊框 */
+            left: 1rem; /* 從左側留出一點距離 */
+            padding: 2px 12px;
+            background-color: #fef08a; 
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #854d0e;
+            z-index: 20; /* 確保在卡片上方 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        /* 收合內容動畫 */
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+        }
+        
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        
+        .accordion-header.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 楓葉飄落容器 -->
+    <div id="maple-fall-container" class="maple-fall-container"></div>
+    
+    <!-- 側邊欄 (Side Menu) - 現在是頂部導航列 -->
+    <nav id="sidebar">
+        <!-- Day tabs will be inserted here by JavaScript -->
+    </nav>
+
+    <!-- 主內容區 -->
+    <main class="main-container relative z-20 px-4">
+        
+        <!-- 主標題區 (固定顯示) -->
+        <!-- 初始設為 display: block，由 JS 控制切換 -->
+        <header class="text-center transition-all duration-500" id="main-header" style="display: block;">
+            <h1 class="text-5xl md:text-7xl font-extrabold leading-tight tracking-wider animated-title" style="letter-spacing: 0.1em; line-height: 1.3;">
+                <!-- 【修正】標題分行 -->
+                2025 大阪楓年祭<br>
+                散策旅圖
+            </h1>
+            <!-- 這裡移除了 font-serif 類別，讓它繼承 body 的 Noto Serif TC 設定 -->
+            <p class="text-xl md:text-2xl mt-6 text-gray-700 italic">
+                我好想好想飛 <span class="inline-block text-red-500 animate-pulse">🍁</span> 逃進那個楓狂世界
+            </p>
+        </header>
+
+        <!-- 行程內容區 (點擊側邊欄後顯示) -->
+        <div id="itinerary-content">
+            <!-- Content will be inserted here by JavaScript -->
+        </div>
+    </main>
+
+    <script>
+        // =================================================================
+        // 1. 全域變數宣告 (集中管理，避免重複宣告)
+        // =================================================================
+        let currentDay = null; // 初始為 null，表示沒有選擇任何日期
+        let gravityX = 0;
+        let leafCountMultiplier = 1; 
+        
+        // =================================================================
+        // 2. 旅遊行程資料
+        // =================================================================
+        const itineraryData = [
+            {
+                day: "Day 1",
+                date: "11/29(六)",
+                theme: "台灣高雄 → 日本大阪 → 雅",
+                events: [
+                    { time: "12:00", type: "Preparation", action: "出門 → 買麥當勞帶去機場", location: "高雄 (Kaohsiung)", details: ["爸爸開車前往機場。"] },
+                    { time: "12:30 - 15:00", type: "Procedure", action: "華航櫃檯報到、辦理出境手續", location: "高雄國際機場", details: ["領取機票、托運、出關。"] },
+                    { time: "15:25 - 19:10", type: "Flight", action: "搭乘中華航空 CI176 班機", location: "高雄國際機場 → 關西國際機場", details: ["時差考量：日本時間 (JST) +1 小時。"], isImportant: true }, 
+                    { time: "19:10 - 19:40", type: "Procedure", action: "辦理入境手續", location: "關西國際機場", details: ["啟用 eSIM。", "辦理 VJW (Visit Japan Web) 手續。"] },
+                    { time: "19:40 - 20:40", type: "Action", action: "JR綠色窗口購買票券及IC卡加值", location: "關西國際空港駅", details: ["購買「關西廣域周遊券」。", "領取已劃位車票。", "IC卡加值並購買簡單食物。"], isImportant: true, activityType: "手續辦理" },
+                    { time: "20:46 - 22:03", type: "Transport", method: "JR 特急", number: "HARUKA 56號", cost: "¥2200 (含周遊券內)", duration: "約 1 小時 17 分鐘", steps: [{ from: "関西空港駅", to: "京都駅", serviceName: "HARUKA", serviceNumber: "56號", direction: "往 京都", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "22:10 - 22:20", type: "Transport", method: "地鐵", number: "烏丸線", cost: "¥220", duration: "約 10 分鐘", steps: [{ from: "京都駅", to: "五条駅", serviceName: "烏丸線", serviceNumber: "", direction: "往 国際会館", transfer: { isTransfer: false } }] },
+                    { time: "22:20 - 22:35", type: "Action", action: "步行至住宿地點「雅」", location: "五条駅 → 雅", details: ["步行約 15 分鐘。", "需提早與民宿聯絡，告知入住時間將超過 22:00。"], activityType: "入住" },
+                    { time: "22:35", type: "Action", action: "入住飯店", location: "雅 (Miyabi)", details: ["本日住宿：雅。"] },
+                ]
+            },
+            {
+                day: "Day 2",
+                date: "11/30(日)",
+                theme: "貴船神社 → 鞍馬寺 → 宇治散策",
+                events: [
+                    { time: "06:15 - 06:30", type: "Movement", action: "步行", location: "雅 → 清水五条駅", details: [] },
+                    { time: "06:30 - 06:56", type: "Transport", method: "地鐵", number: "京阪本線 準急行", cost: "¥280", duration: "約 26 分鐘", steps: [{ from: "清水五条駅", to: "出町柳駅", serviceName: "京阪本線", serviceNumber: "準急行", direction: "往 出町柳", transfer: { isTransfer: false, note: "7:17 班次為觀光列車 KIRARA。" } }] },
+                    { time: "07:17 - 07:47", type: "Transport", method: "電鐵", number: "叡山電鐵本線", cost: "¥470", duration: "約 30 分鐘", steps: [{ from: "出町柳駅", to: "貴船口駅", serviceName: "叡山電鐵本線", serviceNumber: "", direction: "往 鞍馬", transfer: { isTransfer: false } }] },
+                    { time: "07:47 - 08:00", type: "Movement", action: "轉乘公車", location: "貴船口駅前", details: ["步行約 4 分鐘至公車站。"] },
+                    { time: "08:00 - 08:05", type: "Transport", method: "公車", number: "京都バス 33號", cost: "¥200", duration: "約 5 分鐘", steps: [{ from: "叡電貴船口駅前", to: "貴船駅", serviceName: "33號公車", serviceNumber: "", direction: "往 貴船", transfer: { isTransfer: false } }] },
+                    { time: "08:05 - 10:00", type: "Activity", action: "參觀貴船神社 (門票 ¥700)", location: "貴船神社", details: ["門票 ¥700。", "神社水籤 ¥200/人。", "川床位可能多收 ¥500。"], isImportant: true, activityType: "賞楓/參拜" },
+                    { time: "10:00 - 10:15", type: "Transport", method: "公車", number: "京都バス 33號", cost: "¥200", duration: "約 15 分鐘", steps: [{ from: "貴船", to: "叡電貴船口駅前", serviceName: "33號公車", serviceNumber: "", direction: "往 叡電貴船口駅前", transfer: { isTransfer: false } }] },
+                    { time: "10:30 - 11:00", type: "Transport", method: "電鐵", number: "叡山電鐵本線", cost: "¥220", duration: "約 30 分鐘", steps: [{ from: "貴船口駅", to: "鞍馬駅", serviceName: "叡山電鐵本線", serviceNumber: "", direction: "往 鞍馬", transfer: { isTransfer: false } }] },
+                    { time: "11:00 - 12:00", type: "Lunch", action: "午餐：Nagomiya Kotengu", location: "鞍馬寺附近", details: ["步行約 10 分鐘。"] },
+                    { time: "12:00 - 13:00", type: "Activity", action: "參觀鞍馬寺 (門票 ¥300) 與搭乘纜車", location: "鞍馬寺", details: ["門票 ¥300。", "纜車 ¥200。"], isImportant: true, activityType: "參拜" },
+                    { time: "13:00 - 14:13", type: "Transport", method: "多段轉乘", number: "電鐵/京阪/JR奈良線", cost: "¥470 + 廣域券", duration: "約 1 小時 13 分鐘", steps: [{ from: "鞍馬駅", to: "出町柳駅", serviceName: "叡山電鐵本線", serviceNumber: "", direction: "往 出町柳", transfer: { isTransfer: true, station: "出町柳駅" } }, { from: "出町柳駅", to: "東福寺駅", serviceName: "京阪本線", serviceNumber: "", direction: "往 淀屋橋", transfer: { isTransfer: true, station: "東福寺駅" } }, { from: "東福寺駅", to: "宇治駅", serviceName: "JR奈良線", serviceNumber: "", direction: "往 城陽/奈良", transfer: { isTransfer: false, note: "廣域券搭乘" } }], isImportant: true },
+                    { time: "14:13 - 14:23", type: "Movement", action: "步行至 中村藤吉(平等院店)", location: "宇治駅 → 中村藤吉", details: ["領取號碼牌。"] },
+                    { time: "14:23 - 17:30", type: "Activity", action: "參觀宇治神社、宇治公園", location: "宇治", details: ["宇治神社", "宇治公園", "17:30 於平等院等待夜間拝観。"], activityType: "參拜/散策" },
+                    { time: "17:30 - 19:20", type: "Activity", action: "平等院夜間特別拝観 (¥2200)", location: "平等院", details: ["門票 ¥700 + 夜間 ¥1500。"], isImportant: true, activityType: "特別拝観" },
+                    { time: "19:20 - 19:50", type: "Dinner", action: "晚餐：宇治周邊", location: "宇治", details: ["尋找在地美食。"] },
+                    { time: "19:50 - 20:00", type: "Transport", method: "多段轉乘", number: "JR奈良線 + 京阪本線", cost: "廣域券 + ¥280", duration: "約 30 分鐘", steps: [{ from: "宇治駅", to: "東福寺駅", serviceName: "JR奈良線", serviceNumber: "", direction: "往 京都", transfer: { isTransfer: true, station: "東福寺駅" } }, { from: "東福寺駅", to: "清水五条駅", serviceName: "京阪本線", serviceNumber: "", direction: "往 出町柳", transfer: { isTransfer: false } }] },
+                    { time: "20:00", type: "Action", action: "回到住宿地點「雅」", location: "雅", details: [] },
+                ]
+            },
+            {
+                day: "Day 3",
+                date: "12/1(一)",
+                theme: "清水寺賞楓 → 銀閣寺 → 哲學之道 → 和歌山",
+                events: [
+                    { time: "06:00 - 06:30", type: "Movement", action: "步行至清水寺", location: "雅 → 清水寺", details: ["路程約 26 分鐘。"] },
+                    { time: "06:30 - 09:20", type: "Activity", action: "參觀清水寺 (門票 ¥500)", location: "清水寺", details: ["門票 ¥500。", "清水舞台賞楓。"], isImportant: true, activityType: "賞楓/參拜" },
+                    { time: "09:20 - 09:48", type: "Transport", method: "公車", number: "EX100 City Bus", cost: "¥500", duration: "約 28 分鐘", steps: [{ from: "五条坂", to: "銀閣寺前", serviceName: "EX100 City Bus", serviceNumber: "", direction: "往 銀閣寺前", transfer: { isTransfer: false } }] },
+                    { time: "09:48 - 12:30", type: "Activity", action: "銀閣寺、哲學之道、永觀堂", location: "銀閣寺 → 南禪寺", details: ["銀閣寺門票 ¥500。", "永觀堂門票 ¥600。", "哲學之道散策。"], isImportant: true, activityType: "賞楓" },
+                    { time: "12:30 - 14:00", type: "Lunch", action: "午餐：京烏龍麵ごん太", location: "哲學之路", details: ["休息喝咖啡。"] },
+                    { time: "14:00 - 14:30", type: "Activity", action: "參觀南禪寺", location: "南禪寺", details: [] },
+                    { time: "14:30 - 14:50", type: "Transport", method: "公車", number: "5 City Bus", cost: "¥230", duration: "約 20 分鐘", steps: [{ from: "南禪寺", to: "四條河原町", serviceName: "5 City Bus", serviceNumber: "", direction: "往 四條河原町", transfer: { isTransfer: false } }] },
+                    { time: "14:50 - 17:00", type: "Shopping", action: "四條河原町逛街", location: "四條河原町", details: ["OS Drug Store", "kiddy land", "Yojiya", "RABBIT BAGELS"], activityType: "購物" },
+                    { time: "17:00 - 17:20", type: "Movement", action: "回民宿取行李", location: "雅", details: [] },
+                    { time: "17:20 - 17:47", type: "Transport", method: "地鐵", number: "烏丸線", cost: "¥220", duration: "約 27 分鐘", steps: [{ from: "五条駅", to: "京都駅", serviceName: "烏丸線", serviceNumber: "", direction: "往 竹田", transfer: { isTransfer: false } }] },
+                    { time: "17:47 - 19:23", type: "Transport", method: "JR 特急", number: "黒潮特急くろしお", cost: "廣域券", duration: "約 1 小時 36 分鐘", steps: [{ from: "京都駅", to: "和歌山駅", serviceName: "黒潮特急", serviceNumber: "くろしお", direction: "往 白濱", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "19:23 - 19:40", type: "Action", action: "步行至飯店", location: "和歌山駅 → 多美迎", details: [] },
+                    { time: "19:40 - 21:00", type: "Dinner", action: "晚餐：和歌山駅周邊", location: "和歌山駅", details: [] },
+                    { time: "21:00", type: "Action", action: "入住飯店", location: "多美迎 Premium 和歌山", details: ["本日住宿：多美迎 Premium 和歌山。"] },
+                ]
+            },
+            {
+                day: "Day 4",
+                date: "12/2(二)",
+                theme: "那智 → 那智瀑布",
+                events: [
+                    { time: "08:20", type: "Movement", action: "步行前往和歌山駅", location: "飯店 → 和歌山駅", details: ["出發前買午餐。"] },
+                    { time: "08:48 - 11:40", type: "Transport", method: "JR 特急", number: "黒潮號 (くろしお 1)", cost: "¥6140", duration: "約 2 小時 52 分鐘", steps: [{ from: "和歌山駅", to: "紀伊勝浦駅", serviceName: "黒潮號", serviceNumber: "くろしお 1", direction: "往 新宮", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "11:50 - 12:08", type: "Transport", method: "公車", number: "南海巴士31線", cost: "¥430", duration: "約 18 分鐘", steps: [{ from: "紀伊勝浦駅", to: "二の瀬橋", serviceName: "南海巴士31線", serviceNumber: "", direction: "往 那智山", transfer: { isTransfer: false } }] },
+                    { time: "12:20 - 13:00", type: "Lunch", action: "午餐：Grill Ikk", location: "二の瀬橋", details: [] },
+                    { time: "13:00 - 13:15", type: "Action", action: "大門坂茶屋換裝", location: "大門坂茶屋", details: ["平安服裝體驗。"] },
+                    { time: "13:30 - 14:00", type: "Activity", action: "參觀那智大社、青岸渡寺", location: "那智大社", details: ["部分門票 ¥300。", "夫婦杉拍照。"], isImportant: true, activityType: "參拜" },
+                    { time: "15:00 - 15:20", type: "Activity", action: "觀賞那智瀑布", location: "飛瀧神社", details: ["門票 ¥300。"] },
+                    { time: "15:20 - 15:30", type: "Transport", method: "公車", number: "南海巴士31線", cost: "¥200", duration: "約 10 分鐘", steps: [{ from: "那智瀑布", to: "熊野古道站", serviceName: "南海巴士31線", serviceNumber: "", direction: "往 紀伊勝浦駅", transfer: { isTransfer: false } }] },
+                    { time: "15:50 - 16:31", type: "Action", action: "換回便服", location: "大門坂茶屋", details: [] },
+                    { time: "16:32 - 16:53", type: "Transport", method: "公車", number: "南海巴士31線", cost: "¥540", duration: "約 21 分鐘", steps: [{ from: "熊野古道站", to: "紀伊勝浦駅", serviceName: "南海巴士31線", serviceNumber: "", direction: "往 紀伊勝浦駅", transfer: { isTransfer: false } }] },
+                    { time: "17:00 - 17:50", type: "Dinner", action: "晚餐：車站附近", location: "紀伊勝浦駅", details: ["海鮮料理。"] },
+                    { time: "18:04 - 21:02", type: "Transport", method: "JR 特急", number: "黒潮號 (くろしお36)", cost: "¥6140", duration: "約 2 小時 58 分鐘", steps: [{ from: "紀伊勝浦駅", to: "和歌山駅", serviceName: "黒潮號", serviceNumber: "くろしお36", direction: "往 新大阪", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "21:02", type: "Action", action: "回到飯店", location: "多美迎 Premium 和歌山", details: [] },
+                ]
+            },
+            {
+                day: "Day 5",
+                date: "12/3(三)",
+                theme: "小玉電車 → 和歌山城 → 黒潮市場",
+                events: [
+                    { time: "07:00 - 07:30", type: "Movement", action: "步行前往和歌山駅", location: "飯店 → 和歌山駅", details: ["於飯店先寄放行李。"] },
+                    { time: "07:30 - 08:30", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "和歌山駅", to: "伊太祈曽駅", serviceName: "貴志川線", serviceNumber: "小玉電車", direction: "往 貴志", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "08:30 - 09:15", type: "Activity", action: "參觀伊太祁曽神社", location: "伊太祁曽神社", details: ["從伊太祈曽駅步行可達。"], activityType: "參拜" },
+                    { time: "09:15 - 09:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "伊太祈曽駅", to: "貴志駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 貴志", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "09:45 - 10:15", type: "Activity", action: "參觀貴志駅貓站長", location: "貴志駅", details: ["貓站長上班時間約 10:00 後。"], activityType: "觀光" },
+                    { time: "10:15 - 10:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "貴志駅", to: "和歌山駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 和歌山駅", transfer: { isTransfer: false } }] },
+                    { time: "10:45 - 11:00", type: "Transport", method: "公車", number: "和歌山巴士30線", cost: "¥230", duration: "約 15 分鐘", steps: [{ from: "和歌山駅", to: "和歌山城前", serviceName: "30號公車", serviceNumber: "", direction: "往 雑賀崎", transfer: { isTransfer: false } }] },
+                    { time: "11:00 - 12:00", type: "Activity", action: "參觀和歌山城 (門票 ¥410)", location: "和歌山城", details: ["門票 ¥410。", "推薦茶屋冰淇淋。"], isImportant: true, activityType: "觀光" },
+                    { time: "12:00 - 12:15", type: "Movement", action: "步行至和歌山城前公車站", location: "和歌山城前", details: [] },
+                    { time: "12:15 - 13:00", type: "Transport", method: "公車", number: "和歌山巴士121線", cost: "¥520", duration: "約 45 分鐘", steps: [{ from: "和歌山城前", to: "マリーナシティ", serviceName: "121號公車", serviceNumber: "", direction: "往 海南駅前", transfer: { isTransfer: false } }] },
+                    { time: "13:00 - 14:30", type: "Lunch", action: "午餐：黒潮市場", location: "黒潮市場", details: ["黑鮪魚表演。", "Maruki 麵包。"] },
+                    { time: "14:30 - 14:50", type: "Transport", method: "公車+纜車", number: "121線+纜車", cost: "¥270+¥800", duration: "約 20 分鐘", steps: [{ from: "マリーナシティ", to: "紀三井寺", serviceName: "121號公車", serviceNumber: "", direction: "往 JR和歌山駅", transfer: { isTransfer: false } }] },
+                    { time: "15:00 - 15:30", type: "Activity", action: "參觀紀三井寺", location: "紀三井寺", details: [] },
+                    { time: "15:30 - 15:50", type: "Transport", method: "JR 線", number: "紀之國線", cost: "廣域券", duration: "約 20 分鐘", steps: [{ from: "紀三井寺駅", to: "和歌山駅", serviceName: "紀之國線", serviceNumber: "", direction: "往 和歌山", transfer: { isTransfer: false } }] },
+                    { time: "16:50 - 17:33", type: "Transport", method: "JR 特急", number: "黒潮號 (くろしお 26)", cost: "¥2630", duration: "約 43 分鐘", steps: [{ from: "和歌山駅", to: "天王寺駅", serviceName: "黒潮號", serviceNumber: "26號", direction: "往 新大阪", transfer: { isTransfer: true, station: "天王寺" } }] },
+                    { time: "17:33 - 17:50", type: "Transport", method: "JR+地鐵", number: "關西本線+御堂筋線", cost: "¥220", duration: "約 17 分鐘", steps: [{ from: "天王寺", to: "難波駅", serviceName: "關西本線", serviceNumber: "", direction: "往 JR難波", transfer: { isTransfer: false } }] },
+                    { time: "17:50", type: "Action", action: "入住飯店", location: "APA Hotel 大阪難波站前塔", details: ["本日住宿。"] },
+                ]
+            },
+            {
+                day: "Day 6",
+                date: "12/4(四)",
+                theme: "勝尾寺 → 箕面萱野 → 梅田 → 道頓堀",
+                events: [
+                    { time: "08:11 - 08:47", type: "Transport", method: "地鐵", number: "御堂筋線/北大阪急行線", cost: "¥530", duration: "約 36 分鐘", steps: [{ from: "難波站", to: "箕面萱野駅", serviceName: "御堂筋線", serviceNumber: "", direction: "往 箕面萱野", transfer: { isTransfer: false } }] },
+                    { time: "09:00 - 09:30", type: "Transport", method: "公車", number: "阪急巴士30線", cost: "¥800", duration: "約 30 分鐘", steps: [{ from: "箕面萱野", to: "勝尾寺", serviceName: "阪急巴士30線", serviceNumber: "", direction: "往 勝尾寺", transfer: { isTransfer: false } }] },
+                    { time: "09:30 - 11:50", type: "Activity", action: "參觀勝尾寺 (門票 ¥500)", location: "勝尾寺", details: ["達摩不倒翁。", "蓋章巡禮。"], isImportant: true, activityType: "參拜" },
+                    { time: "11:50 - 12:11", type: "Transport", method: "公車", number: "阪急巴士30線", cost: "¥800", duration: "約 21 分鐘", steps: [{ from: "勝尾寺", to: "箕面萱野", serviceName: "阪急巴士30線", serviceNumber: "", direction: "往 箕面萱野", transfer: { isTransfer: false } }] },
+                    { time: "12:11 - 12:43", type: "Transport", method: "地鐵", number: "北大阪急行線", cost: "¥480", duration: "約 32 分鐘", steps: [{ from: "箕面萱野", to: "梅田站", serviceName: "御堂筋線", serviceNumber: "", direction: "往 中百舌鳥", transfer: { isTransfer: false } }] },
+                    { time: "13:00 - 17:30", type: "Shopping", action: "梅田逛街", location: "梅田", details: ["阪急三番街", "Loft", "LUCUA", "友都八喜"], activityType: "購物" },
+                    { time: "17:37 - 17:53", type: "Transport", method: "地鐵", number: "御堂筋線", cost: "¥240", duration: "約 16 分鐘", steps: [{ from: "梅田站", to: "難波站", serviceName: "御堂筋線", serviceNumber: "", direction: "往 中百舌鳥", transfer: { isTransfer: false } }] },
+                    { time: "18:00 - 21:00", type: "Dinner", action: "晚餐：道頓堀", location: "道頓堀", details: ["大起水產迴轉壽司。"] },
+                    { time: "21:00", type: "Shopping", action: "Life 超市", location: "難波", details: ["買水果零食。"] },
+                ]
+            },
+            {
+                day: "Day 7",
+                date: "12/5(五)",
+                theme: "神戶布引香草園 → 摩耶山夜景",
+                events: [
+                    { time: "08:00 - 09:06", type: "Transport", method: "電車", number: "阪神難波線", cost: "¥630", duration: "約 1 小時", steps: [{ from: "大阪難波", to: "神戸三宮", serviceName: "阪神難波線", serviceNumber: "", direction: "往 神戸三宮", transfer: { isTransfer: true, station: "三宮轉地鐵" } }, { from: "三宮", to: "新神戶", serviceName: "西神山手線", serviceNumber: "", direction: "往 新神戶", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "09:40 - 11:30", type: "Activity", action: "神戶布引香草園 (套票 ¥4500)", location: "香草園", details: ["含纜車費用。"], activityType: "觀光" },
+                    { time: "11:40 - 15:50", type: "Shopping", action: "神戶市區散策", location: "三宮/元町/港區", details: ["生田神社", "元町商店街", "神戶港塔", "麵包超人博物館"], activityType: "觀光" },
+                    { time: "16:35 - 17:05", type: "Transport", method: "纜車", number: "摩耶山纜車", cost: "¥1560(來回)", duration: "約 30 分鐘", steps: [{ from: "瑪雅電纜站", to: "星之站", serviceName: "摩耶纜車", serviceNumber: "", direction: "往 山頂", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "17:05 - 18:10", type: "Activity", action: "摩耶山掬星台夜景", location: "摩耶山", details: ["日本三大夜景。"], isImportant: true, activityType: "夜景" },
+                    { time: "18:10 - 19:02", type: "Transport", method: "纜車+公車", number: "下山", cost: "¥230", duration: "約 52 分鐘", steps: [{ from: "星之站", to: "三宮", serviceName: "公車2系統", serviceNumber: "", direction: "往 三宮", transfer: { isTransfer: false } }] },
+                    { time: "20:00 - 20:42", type: "Transport", method: "電車", number: "阪神本線", cost: "¥330", duration: "約 42 分鐘", steps: [{ from: "神戸三宮", to: "大阪梅田", serviceName: "阪神本線", serviceNumber: "", direction: "往 梅田", transfer: { isTransfer: false } }] },
+                    { time: "20:42 - 21:04", type: "Transport", method: "地鐵", number: "四橋線", cost: "¥240", duration: "約 22 分鐘", steps: [{ from: "西梅田", to: "難波", serviceName: "四橋線", serviceNumber: "", direction: "往 住之江公園", transfer: { isTransfer: false } }] },
+                ]
+            },
+            {
+                day: "Day 8",
+                date: "12/6(六)",
+                theme: "難波散策 → 返程",
+                events: [
+                    { time: "08:15 - 09:30", type: "Lunch", action: "早餐：丸福咖啡店", location: "千日前本店", details: [] },
+                    { time: "09:50 - 11:00", type: "Activity", action: "參觀八板神社", location: "八板神社", details: ["獅子殿。"], activityType: "參拜" },
+                    { time: "11:00 - 13:30", type: "Shopping", action: "難波 City 逛街", location: "難波 City", details: ["MUJI", "mont-bell"], activityType: "購物" },
+                    { time: "13:30 - 14:30", type: "Lunch", action: "午餐：piccoLo咖喱", location: "NAMBA WALK店", details: ["嚐嚐他們的招牌咖哩！"] },
+                    { time: "14:30 - 15:50", type: "Shopping", action: "Life 超市購買零食", location: "難波", details: ["要注意是否有退稅櫃檯。", "可順便採買伴手禮。"], activityType: "購物" },
+                    { time: "15:50 - 16:30", type: "Action", action: "返回飯店領取行李", location: "APA Hotel 大阪難波站前塔", details: ["預留充裕時間整理行李，並將大件物品寄出。"], activityType: "領取行李" },
+                    { time: "16:30 - 17:00", type: "Movement", action: "步行至南海難波站", location: "南海難波駅", details: ["步行約 11 分鐘，準備搭乘 RAPIT 特急。"] },
+                    { time: "17:00 - 17:37", type: "Transport", method: "南海特急", number: "RAPIT ẞ 55", cost: "¥1490", duration: "約 37 分鐘", steps: [{ from: "南海難波", to: "關西機場", serviceName: "RAPIT", serviceNumber: "55號", direction: "往 機場", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "20:10 - 22:45", type: "Flight", action: "搭乘華航 C1177航班", location: "大阪 → 高雄", details: ["回家囉。"], isImportant: true },
+                ]
+            }
+        ];
+
+        // =================================================================
+        // 3. UI 產生函式
+        // =================================================================
+        
+        function cleanLocationName(locationString) {
+            if (typeof locationString !== 'string') return "";
+            return locationString.split('(')[0].trim();
+        }
+
+        function getEventIcon(type, method = '') {
+            const iconClass = "w-6 h-6";
+            // 飛機圖示
+            if (type === 'Flight') return `<svg class="${iconClass} text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>`;
+            // 交通圖示
+            if (type === 'Transport') {
+                // 公車圖示
+                if (method && (method.includes('公車') || method.includes('巴士'))) return `<svg class="${iconClass} text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>`;
+                // 火車/電車圖示
+                return `<svg class="${iconClass} text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
+            }
+            // 一般流程/行動圖示
+            if (['Procedure','Preparation','Action','Movement'].includes(type)) return `<svg class="${iconClass} text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>`;
+            // 餐飲圖示
+            if (['Lunch','Dinner'].includes(type)) return `<svg class="${iconClass} text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 2h2M7 2h2M15 2h2M6 22h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v13a2 2 0 002 2z"></path></svg>`;
+            // 活動/觀光圖示
+            if (type === 'Activity') return `<svg class="${iconClass} text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>`;
+            // 購物圖示
+            if (type === 'Shopping') return `<svg class="${iconClass} text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>`;
+            return `<svg class="${iconClass} text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
+        }
+
+        function toggleDetails(contentId) {
+            const content = document.getElementById(contentId);
+            if (!content) return;
+            const header = content.previousElementSibling; 
+            
+            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                content.style.maxHeight = '0px';
+                if(header) header.classList.remove('active');
+            } else {
+                content.style.maxHeight = content.scrollHeight + "px";
+                if(header) header.classList.add('active');
+            }
+        }
+
+        function renderTransportStep(step, index, totalSteps, method, cost) {
+            const isTransfer = step.transfer && step.transfer.isTransfer;
+            const labelText = step.serviceName + (step.serviceNumber ? ` ${step.serviceNumber}` : '');
+            let transferInfo = '';
+            
+            if (isTransfer) {
+                transferInfo = `<p class="text-sm text-yellow-600 mt-2 font-bold flex items-center">
+                    <span class="mr-1">🔄</span> 轉乘車站: ${cleanLocationName(step.transfer.station)}
+                </p>`;
+            } else if (step.transfer && step.transfer.note) {
+                transferInfo = `<p class="text-xs text-gray-500 mt-2 italic">ⓘ ${step.transfer.note}</p>`;
+            }
+            
+            return `
+                <div class="transport-card p-4 rounded-lg shadow-md mb-6 hover:ring-2 hover:ring-red-300">
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="text-lg font-bold text-red-700">${method}</h4>
+                        <span class="text-sm font-semibold bg-red-100 text-red-800 px-3 py-1 rounded-full">${cost}</span>
+                    </div>
+                    <div class="flex items-center mt-3">
+                        <div class="flex flex-col items-center min-w-[80px] text-center">
+                            <div class="w-3 h-3 bg-red-700 rounded-full"></div>
+                            <span class="text-sm mt-1 font-medium">${cleanLocationName(step.from)}</span>
+                        </div>
+                        <div class="transport-line mx-2 flex items-center justify-center flex-grow">
+                            <div class="transport-label">${labelText}</div>
+                        </div>
+                        <div class="flex flex-col items-center min-w-[80px] text-center">
+                            <div class="w-3 h-3 bg-red-700 rounded-full"></div>
+                            <span class="text-sm mt-1 font-bold text-red-700">${cleanLocationName(step.to)}</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 border-t pt-3 border-gray-200">
+                        <p class="text-sm text-gray-700"><span class="font-bold text-red-600">方向:</span> ${cleanLocationName(step.direction)}</p>
+                        ${transferInfo}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderItinerary(dayData) {
+            const contentDiv = document.getElementById('itinerary-content');
+            
+            let html = `
+                <h2 class="text-4xl font-bold text-gray-800 mb-2 border-b pb-4 border-red-200 flex items-center">
+                    <span class="bg-red-100 text-red-800 px-3 py-1 rounded-lg text-xl mr-4">${dayData.day}</span>
+                    ${dayData.date}
+                </h2>
+                <h3 class="text-xl font-semibold text-red-600 mb-8 flex items-center">
+                    <span class="mr-2">🎯</span>${dayData.theme}
+                </h3>
+                <div class="timeline-container relative">
+                    <div id="timeline-line-${dayData.day}" class="timeline-line"></div>
+            `; // Added ID for line
+
+            dayData.events.forEach((event, index) => {
+                const isImportant = event.isImportant ? ' flashing-border ring-2 ring-red-200' : '';
+                const contentId = `${dayData.day}-${index}-content`;
+                const iconSvg = getEventIcon(event.type, event.method);
+
+                let cardContentHtml = '';
+                let bgColor = 'bg-white';
+                
+                // 根據類型設定卡片顏色
+                if (event.type === 'Transport') bgColor = 'bg-blue-50';
+                else if (['Lunch', 'Dinner'].includes(event.type)) bgColor = 'bg-orange-50';
+                else if (event.type === 'Activity') bgColor = 'bg-red-50';
+                else if (event.type === 'Flight') bgColor = 'bg-purple-50';
+                else if (event.type === 'Action' && event.action.includes('入住飯店')) bgColor = 'bg-green-50'; // 飯店用綠色
+
+                if (event.type === 'Transport' && event.steps && event.steps.length > 0) {
+                     const headerHtml = `
+                        <div class="flex-grow">
+                            <h4 class="text-xl font-bold text-gray-800 flex items-center">
+                                ${event.number} <span class="ml-2 text-sm font-normal text-gray-600 bg-white px-2 py-0.5 rounded border border-gray-200">${event.method}</span>
+                            </h4>
+                            <p class="text-sm text-gray-600 mt-1 font-medium flex items-center">
+                                <span class="mr-1">⏱️</span> ${event.duration}
+                            </p>
+                        </div>
+                        <svg class="w-6 h-6 text-gray-400 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    `;
+                    const contentHtml = `<div class="pt-4 space-y-4">${event.steps.map((step, i) => renderTransportStep(step, index, event.steps.length, event.method, event.cost)).join('')}</div>`;
+                    cardContentHtml = `
+                        <div class="accordion-header cursor-pointer flex items-center" onclick="toggleDetails('${contentId}')">${headerHtml}</div>
+                        <div id="${contentId}" class="collapsible-content" style="max-height: 0px;">${contentHtml}</div>
+                    `;
+                } else {
+                    const detailsList = event.details ? event.details.map(d => `<li class="flex items-start text-gray-700 mb-1"><span class="text-red-400 mr-2">•</span>${d}</li>`).join('') : '';
+                    const locationClean = cleanLocationName(event.location);
+                    const headerHtml = `
+                        <div class="flex-grow">
+                            <h4 class="text-xl font-bold text-gray-900">${event.action}</h4>
+                            ${locationClean ? `<p class="text-sm text-gray-600 mt-1 font-medium flex items-center"><span class="mr-1">📍</span>${locationClean}</p>` : ''}
+                        </div>
+                        ${detailsList ? `<svg class="w-6 h-6 text-gray-400 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>` : ''}
+                    `;
+                    
+                    cardContentHtml = `
+                           <div class="accordion-header ${detailsList ? 'cursor-pointer' : ''} flex items-center" ${detailsList ? `onclick="toggleDetails('${contentId}')"` : ''}>${headerHtml}</div>
+                           ${detailsList ? `<div id="${contentId}" class="collapsible-content" style="max-height: 0px;"><ul class="mt-3 pl-2 border-t border-gray-200 pt-2">${detailsList}</ul></div>` : ''}
+                    `;
+                }
+
+                html += `
+                    <div class="timeline-item group" id="timeline-item-${index}">
+                        <div class="timeline-icon group-hover:scale-110 transition-transform bg-white">
+                            ${iconSvg}
+                        </div>
+                        <!-- 時間框現在位於卡片內部 -->
+                        <div class="timeline-content-card ${bgColor} p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md ${isImportant}">
+                             <div class="timeline-time-box shadow-sm border border-yellow-200">
+                                 ${event.time}
+                            </div>
+                            ${cardContentHtml}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            contentDiv.innerHTML = html;
+            contentDiv.classList.add('show');
+            
+            // 修正：在內容渲染完成後，計算並設置時間軸線的高度
+            const lastItem = document.getElementById(`timeline-item-${dayData.events.length - 1}`);
+            if (lastItem) {
+                const line = document.getElementById(`timeline-line-${dayData.day}`);
+                // 計算到最後一個 icon 中央底部的位置
+                const height = lastItem.offsetTop + 24; 
+                line.style.height = `${height}px`;
+            }
+        }
+
+        function renderSidebar() {
+            const sidebarNav = document.getElementById('sidebar');
+            
+            // 【修正 1】新增回到首頁按鈕 (Day 0)
+            let itemsHtml = `
+                <div class="sidebar-item active" onclick="switchDay(0)" id="sidebar-item-home">
+                    <div class="sidebar-icon-container text-red-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                    </div>
+                    <div class="sidebar-text">
+                        <!-- 強制使用紅色來凸顯 -->
+                        <div class="sidebar-text-day" style="font-size:1.1rem; font-weight:800; color: #b91c1c;">回到首頁</div>
+                        <div class="sidebar-text-date text-gray-500">總覽 / 封面</div>
+                    </div>
+                </div>
+                <div class="border-t border-red-100 mx-4 my-2" style="height: 0;"></div>
+            `;
+
+            const dayItemsHtml = itineraryData.map((data, index) => {
+                const dayNum = index + 1;
+                // 原本的 switchDay(${dayNum}) 不變
+                 return `
+                    <div class="sidebar-item" onclick="switchDay(${dayNum})" id="sidebar-item-${dayNum}">
+                        <div class="sidebar-icon-container text-gray-600">
+                            <span class="font-bold text-lg">${dayNum}</span>
+                        </div>
+                        <div class="sidebar-text">
+                            <div class="sidebar-text-day">DAY ${dayNum}</div>
+                            <div class="sidebar-text-date">${data.date}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            // 在横向排列时，移除分隔線，將所有項目放在一行
+            sidebarNav.innerHTML = itemsHtml.replace('<div class="border-t border-red-100 mx-4 my-2" style="height: 0;"></div>', '') + dayItemsHtml;
+        }
+
+        function switchDay(dayNum) {
+            const contentDiv = document.getElementById('itinerary-content');
+            const header = document.getElementById('main-header');
+            
+            // 1. 重設所有側邊欄項目為非活躍狀態
+            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+
+            // 【修正 2】處理 Day 0 (回到首頁) 邏輯
+            if (dayNum === 0) {
+                if(header) {
+                    header.style.display = 'block';
+                    // 確保標題置中時不受內容高度影響，這裡讓 main 容器保持 Flex 狀態
+                    // 已經在 CSS .main-container 中實現了
+                }
+                contentDiv.classList.remove('show');
+                contentDiv.innerHTML = '';
+                const homeItem = document.getElementById('sidebar-item-home');
+                if (homeItem) homeItem.classList.add('active');
+            } else {
+                // 處理一般日期行程 (Day 1, 2, ...) 邏輯
+                if(header) {
+                    header.style.display = 'none';
+                }
+                
+                const dayData = itineraryData.find((d, i) => i + 1 === dayNum);
+                
+                if (dayData) {
+                    document.getElementById(`sidebar-item-${dayNum}`).classList.add('active');
+                    renderItinerary(dayData);
+                }
+            }
+            
+            currentDay = dayNum;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // =================================================================
+        // 4. 楓葉特效
+        // =================================================================
+        function createMapleLeaf() {
+            const container = document.getElementById('maple-fall-container');
+            if(!container) return;
+            const leaf = document.createElement('div');
+            leaf.className = 'maple-leaf';
+            leaf.style.left = Math.random() * 100 + 'vw';
+            const size = 10 + Math.random() * 15;
+            leaf.style.width = size + 'px';
+            leaf.style.height = size + 'px';
+            leaf.style.backgroundColor = ['#e53e3e', '#dd6b20', '#f6ad55', '#fed7d7'][Math.floor(Math.random() * 4)];
+            
+            const duration = 10 + Math.random() * 10;
+            leaf.style.animationDuration = duration + 's';
+            leaf.style.animationName = 'fall' + Math.floor(Math.random() * 2);
+            
+            container.appendChild(leaf);
+            setTimeout(() => leaf.remove(), duration * 1000);
+        }
+
+        function startMapleFall() {
+            // Initial leaves
+            for (let i = 0; i < 20; i++) setTimeout(createMapleLeaf, Math.random() * 3000);
+            // Continuous loop
+            setInterval(() => {
+                const count = Math.floor(Math.random() * leafCountMultiplier) + 1;
+                for(let i=0; i<count; i++) createMapleLeaf();
+            }, 800);
+        }
+
+        function handleOrientation(event) {
+            const x = event.gamma; 
+            if (x !== null) {
+                gravityX = x * 2; 
+                leafCountMultiplier = Math.abs(x) > 15 ? 3 : 1;
+                document.documentElement.style.setProperty('--wind-x', `${gravityX}vw`);
+            }
+        }
+        
+        function handleMouseMove(event) {
+             const width = window.innerWidth;
+             const x = event.clientX;
+             const normalizedX = (x - width / 2) / (width / 2); // -1 to 1
+             const wind = normalizedX * 20; // Max 20vw wind
+             document.documentElement.style.setProperty('--wind-x', `${wind}vw`);
+        }
+
+        // 【功能】處理滾動事件，讓頂部導航欄縮放
+        function handleScroll() {
+            const sidebar = document.getElementById('sidebar');
+            // 當滾動超過 100 像素時，進入緊湊模式
+            if (window.scrollY > 100) {
+                sidebar.classList.add('compact');
+            } else {
+                sidebar.classList.remove('compact');
+            }
+        }
+
+
+        // =================================================================
+        // 5. 初始化 (Initialize)
+        // =================================================================
+        function initializeApp() {
+            renderSidebar();
+            startMapleFall();
+            
+            // Add event listeners
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', handleOrientation);
+            }
+            window.addEventListener('mousemove', handleMouseMove);
+            
+            // 【新增】滾動監聽器
+            window.addEventListener('scroll', handleScroll);
+
+            // 【最終修正】載入時預設顯示首頁 (Day 0)
+            if (itineraryData.length > 0) {
+                setTimeout(() => switchDay(0), 50); 
+            }
+
+            // 【關鍵修正】在初始化時，強制讓導航欄進入 compact 模式
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.add('compact');
+            }
+
+            // Inject dynamic styles for wind
+            const mapleStyleSheet = document.createElement("style");
+            mapleStyleSheet.innerText = `
+                :root { --wind-x: 10vw; }
+                @keyframes fall0 {
+                    0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 0; }
+                    10% { opacity: 1; }
+                    100% { transform: translateY(105vh) translateX(var(--wind-x)) rotateZ(720deg); opacity: 0; }
+                }
+                @keyframes fall1 {
+                    0% { transform: translateY(-10vh) rotateZ(180deg); opacity: 0; }
+                    10% { opacity: 1; }
+                    100% { transform: translateY(105vh) translateX(calc(var(--wind-x) * -0.5)) rotateZ(900deg); opacity: 0; } 
+                }
+            `;
+            document.head.appendChild(mapleStyleSheet);
+        }
+
+        // Run when DOM is ready
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+</body>
+</html>
