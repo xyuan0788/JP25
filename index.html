@@ -52,13 +52,22 @@
         /* 大標題動態效果 (保留 shine，漂浮改由 JS 應用於 span) */
         .animated-title {
             text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            /* 修正：移除漸層效果，改用實心顏色 */
-            color: #b91c1c; /* 使用深紅色以符合楓葉主題 */
+            /* 實心顏色 */
+            color: #b91c1c; 
             background: none;
             -webkit-background-clip: unset;
             -webkit-text-fill-color: unset; 
             animation: shine 5s linear infinite;
         }
+        
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+
+        /* ----------------------- 字符動畫 ----------------------- */
 
         /* 標題文字個體漂浮動畫 */
         @keyframes charFloat {
@@ -67,16 +76,15 @@
             100% { transform: translateY(0) scale(1); opacity: 1; }
         }
         
-        /* 副標題動畫 (縮放脈衝) */
-        @keyframes subtitlePulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.01); opacity: 1; }
+        /* 副標題字符滑動動畫 (非漂浮) */
+        @keyframes charSlideUp {
+            0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+            50% { transform: translateY(-2px); opacity: 1; } /* 小小的回彈效果 */
+            100% { transform: translateY(0) scale(1); opacity: 1; }
         }
         
         .animated-subtitle {
-            /* 修正：移除 opacity: 0 和 animation-delay，讓它一開始就出現 */
             opacity: 1;
-            animation: subtitlePulse 4s ease-in-out infinite forwards;
         }
 
         /* 紅框閃爍特效 */
@@ -121,7 +129,8 @@
             padding-top: 0.1rem;
             padding-bottom: 0.1rem;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.6);
-            justify-content: center;
+            /* 【修正】縮小狀態下靠左對齊，而不是置中 */
+            justify-content: flex-start;
         }
         
         /* 橫向滾動條樣式 (美化) */
@@ -211,7 +220,8 @@
             margin-top: 2rem;
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            /* 【升級 1】切換頁面動畫：使用更誇張的彈跳曲線和更長的動畫時間 (0.8s) */
+            transition: opacity 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: none; 
         }
 
@@ -226,13 +236,112 @@
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             padding: 1rem;
             border-radius: 0.75rem;
+            position: relative; /* 確保箭頭定位 */
         }
 
         .transport-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* 改為中性浮動陰影 */
         }
+
+        /* ----------------------- 交通線路視覺強化 ----------------------- */
+        .transport-line {
+            position: relative;
+            height: 4px; /* 加粗線條 */
+            background-color: #e53e3e; /* 確保線條顏色明確 */
+            margin-top: 10px;
+            flex-grow: 1;
+        }
         
+        /* ------------------- 【新增】波浪移動動畫 ------------------- */
+        @keyframes travelWave {
+            0% { opacity: 0; transform: translateX(-100%); }
+            25% { opacity: 1; transform: translateX(0%); }
+            75% { opacity: 1; transform: translateX(100%); }
+            100% { opacity: 0; transform: translateX(100%); }
+        }
+
+        /* 箭頭容器 */
+        .travel-wave-container {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        /* 箭頭/符號本體 */
+        .travel-symbol {
+            color: white; /* 淺色符號 */
+            font-size: 1.5rem;
+            font-weight: 700;
+            position: absolute;
+            /* 讓符號在線條中心垂直對齊 */
+            top: 50%;
+            transform: translateY(-50%) translateX(-50%); 
+            
+            /* 應用波浪動畫 */
+            animation: travelWave 3s ease-in-out infinite;
+        }
+
+        /* 三個符號的間隔和延遲 */
+        .travel-symbol:nth-child(1) { animation-delay: 0s; }
+        .travel-symbol:nth-child(2) { animation-delay: 0.5s; }
+        .travel-symbol:nth-child(3) { animation-delay: 1s; }
+
+        /* ------------------- 【新增】飛機移動線 ------------------- */
+        .flight-line {
+            position: relative;
+            height: 4px;
+            margin-top: 10px;
+            flex-grow: 1;
+            /* 飛機線使用點狀虛線 */
+            background-image: repeating-linear-gradient(90deg, #9333ea, #9333ea 5px, transparent 5px, transparent 10px);
+        }
+        
+        /* 飛機符號 */
+        .flight-symbol {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%) translateX(-50%);
+            font-size: 1.2rem;
+            color: #9333ea; /* 紫色飛機 */
+            
+            /* 應用波浪動畫 */
+            animation: travelWave 4s ease-in-out infinite; /* 飛機慢一點 */
+        }
+
+        .flight-symbol:nth-child(1) { animation-delay: 0s; }
+        .flight-symbol:nth-child(2) { animation-delay: 1.3s; }
+        .flight-symbol:nth-child(3) { animation-delay: 2.6s; }
+
+
+        /* 交通線路黃色標籤 */
+        .transport-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            background-color: #fef08a; /* 亮黃色背景 (修正為更亮眼) */
+            color: #854d0e; /* 深棕色文字 */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 加強陰影，讓它浮在紅線上 */
+            max-width: 90%; 
+            text-overflow: ellipsis;
+            overflow: hidden;
+            z-index: 10; /* 確保在箭頭之上 */
+        }
+
         /* 路線圖樣式 (Timeline) - 內容卡片 - 液態玻璃 */
         .timeline-content-card {
             /* 讓背景顏色變成半透明，並加上模糊效果 */
@@ -279,7 +388,12 @@
             font-size: 0.85rem; color: #854d0e; z-index: 20; box-shadow: 0 2px 4px rgba(0,0,0,0.08);
         }
 
-        .collapsible-content { overflow: hidden; transition: max-height 0.5s cubic-bezier(0, 1, 0, 1); }
+        /* 收合內容動畫 */
+        .collapsible-content { 
+            overflow: hidden; 
+            /* 【升級 2】展開/收合動畫：使用更誇張的彈跳曲線和更長的動畫時間 (0.5s) */
+            transition: max-height 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
         .toggle-icon { transition: transform 0.3s; }
         .accordion-header.active .toggle-icon { transform: rotate(180deg); }
     </style>
@@ -321,7 +435,7 @@
         let leafCountMultiplier = 1;
         
         // =================================================================
-        // 2. 旅遊行程資料
+        // 2. 旅遊行程資料 (保持不變)
         // =================================================================
         const itineraryData = [
             {
@@ -413,7 +527,7 @@
                     { time: "07:00 - 07:30", type: "Movement", action: "步行前往和歌山駅", location: "飯店 → 和歌山駅", details: ["於飯店先寄放行李。"] },
                     { time: "07:30 - 08:30", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "和歌山駅", to: "伊太祈曽駅", serviceName: "貴志川線", serviceNumber: "小玉電車", direction: "往 貴志", transfer: { isTransfer: false } }], isImportant: true },
                     { time: "08:30 - 09:15", type: "Activity", action: "參觀伊太祁曽神社", location: "伊太祁曽神社", details: ["從伊太祈曽駅步行可達。"], activityType: "參拜" },
-                    { time: "09:15 - 09:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "伊太祈曽駅", to: "貴志駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 貴志", transfer: { isTransfer: false } }], isImportant: true },
+                    { time: "09:15 - 09:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "伊太祈曽駅", to: "貴志駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 貴志", transfer: { isTransfer: false } }] },
                     { time: "09:45 - 10:15", type: "Activity", action: "參觀貴志駅貓站長", location: "貴志駅", details: ["貓站長上班時間約 10:00 後。"], activityType: "觀光" },
                     { time: "10:15 - 10:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "貴志駅", to: "和歌山駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 和歌山駅", transfer: { isTransfer: false } }] },
                     { time: "10:45 - 11:00", type: "Transport", method: "公車", number: "和歌山巴士30線", cost: "¥230", duration: "約 15 分鐘", steps: [{ from: "和歌山駅", to: "和歌山城前", serviceName: "30號公車", serviceNumber: "", direction: "往 雑賀崎", transfer: { isTransfer: false } }] },
@@ -536,6 +650,29 @@
                 transferInfo = `<p class="text-xs text-gray-500 mt-2 italic">ⓘ ${step.transfer.note}</p>`;
             }
             
+            // 決定是交通線路 (Transport) 還是飛機線路 (Flight)
+            const isFlight = step.isFlight || false;
+
+            // 路線中間的動態符號
+            let dynamicLineContent;
+            if (isFlight) {
+                // 飛機路線使用虛線和飛機符號
+                dynamicLineContent = `
+                    <div class="flight-symbol">✈️</div>
+                    <div class="flight-symbol" style="animation-delay: 1.3s;">✈️</div>
+                    <div class="flight-symbol" style="animation-delay: 2.6s;">✈️</div>
+                `;
+            } else {
+                // 一般交通使用 >>> 符號
+                dynamicLineContent = `
+                    <div class="travel-wave-container">
+                        <span class="travel-symbol">»</span>
+                        <span class="travel-symbol" style="animation-delay: 0.5s;">»</span>
+                        <span class="travel-symbol" style="animation-delay: 1s;">»</span>
+                    </div>
+                `;
+            }
+
             return `
                 <div class="transport-card p-4 rounded-lg shadow-md mb-6 hover:ring-2 hover:ring-red-300">
                     <div class="flex items-center justify-between mb-2">
@@ -544,19 +681,20 @@
                     </div>
                     <div class="flex items-center mt-3">
                         <div class="flex flex-col items-center min-w-[80px] text-center">
-                            <div class="w-3 h-3 bg-red-700 rounded-full"></div>
+                            <div class="w-3 h-3 ${isFlight ? 'bg-purple-700' : 'bg-red-700'} rounded-full"></div>
                             <span class="text-sm mt-1 font-medium">${cleanLocationName(step.from)}</span>
                         </div>
-                        <div class="transport-line mx-2 flex items-center justify-center flex-grow">
+                        <div class="${isFlight ? 'flight-line' : 'transport-line'} mx-2 flex items-center justify-center flex-grow">
+                            ${dynamicLineContent}
                             <div class="transport-label">${labelText}</div>
                         </div>
                         <div class="flex flex-col items-center min-w-[80px] text-center">
-                            <div class="w-3 h-3 bg-red-700 rounded-full"></div>
-                            <span class="text-sm mt-1 font-bold text-red-700">${cleanLocationName(step.to)}</span>
+                            <div class="w-3 h-3 ${isFlight ? 'bg-purple-700' : 'bg-red-700'} rounded-full"></div>
+                            <span class="text-sm mt-1 font-bold ${isFlight ? 'text-purple-700' : 'text-red-700'}">${cleanLocationName(step.to)}</span>
                         </div>
                     </div>
                     <div class="mt-4 border-t pt-3 border-gray-200">
-                        <p class="text-sm text-gray-700"><span class="font-bold text-red-600">方向:</span> ${cleanLocationName(step.direction)}</p>
+                        <p class="text-sm text-gray-700"><span class="font-bold ${isFlight ? 'text-purple-600' : 'text-red-600'}">方向:</span> ${cleanLocationName(step.direction)}</p>
                         ${transferInfo}
                     </div>
                 </div>
@@ -584,14 +722,13 @@
                 const iconSvg = getEventIcon(event.type, event.method);
 
                 let cardContentHtml = '';
-                // 使用 Tailwind 顏色類別，但將透明度設定在 CSS .timeline-content-card 裡 (或直接用 alpha)
-                let bgColorClass = 'bg-white/75'; // 預設使用半透明白
+                let bgColorClass = 'bg-white/75';
                 
-                // 根據類型設定卡片顏色 (使用半透明 Tailwind 顏色作為底色/提示色)
+                // 根據類型設定卡片顏色
                 if (event.type === 'Transport') bgColorClass = 'bg-blue-100/50';
                 else if (['Lunch', 'Dinner'].includes(event.type)) bgColorClass = 'bg-orange-100/50';
                 else if (event.type === 'Activity') bgColorClass = 'bg-red-100/50';
-                else if (event.type === 'Flight') bgColorClass = 'bg-purple-100/50';
+                else if (event.type === 'Flight') bgColorClass = 'bg-purple-100/50'; // 飛機用紫色
                 else if (event.type === 'Action' && event.action.includes('入住飯店')) bgColorClass = 'bg-green-100/50'; 
 
                 if (event.type === 'Transport' && event.steps && event.steps.length > 0) {
@@ -611,6 +748,34 @@
                         <div class="accordion-header cursor-pointer flex items-center" onclick="toggleDetails('${contentId}')">${headerHtml}</div>
                         <div id="${contentId}" class="collapsible-content" style="max-height: 0px;">${contentHtml}</div>
                     `;
+                } else if (event.type === 'Flight') {
+                    // 針對 Flight 事件，將 isFlight 標記傳入 renderTransportStep 函式
+                    const flightStep = { ...event.steps?.[0] || { from: cleanLocationName(event.location.split('→')[0]), to: cleanLocationName(event.location.split('→')[1]), serviceName: event.action, direction: event.details[0] }, isFlight: true };
+                    const flightCardHtml = renderTransportStep(flightStep, index, 1, '航班', '無費用'); 
+                    
+                    const headerHtml = `
+                        <div class="flex-grow">
+                            <h4 class="text-xl font-bold text-purple-700 flex items-center">
+                                ${event.action}
+                            </h4>
+                            <p class="text-sm text-gray-600 mt-1 font-medium flex items-center">
+                                <span class="mr-1">🗺️</span> ${cleanLocationName(event.location)}
+                            </p>
+                        </div>
+                        <svg class="w-6 h-6 text-gray-400 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    `;
+                    const detailsList = event.details ? event.details.map(d => `<li class="flex items-start text-gray-700 mb-1"><span class="text-red-400 mr-2">•</span>${d}</li>`).join('') : '';
+
+                    cardContentHtml = `
+                         <div class="accordion-header cursor-pointer flex items-center" onclick="toggleDetails('${contentId}')">${headerHtml}</div>
+                         <div id="${contentId}" class="collapsible-content" style="max-height: 0px;">
+                            <div class="pt-4 space-y-4">
+                                ${flightCardHtml}
+                                ${detailsList ? `<ul class="mt-3 pl-2 border-t border-gray-200 pt-2">${detailsList}</ul>` : ''}
+                            </div>
+                        </div>
+                    `;
+
                 } else {
                     const detailsList = event.details ? event.details.map(d => `<li class="flex items-start text-gray-700 mb-1"><span class="text-red-400 mr-2">•</span>${d}</li>`).join('') : '';
                     const locationClean = cleanLocationName(event.location);
@@ -658,8 +823,8 @@
             }
         }
 
-        // [新增功能] 應用字符動畫
-        function applyTitleAnimation(elementId, rawText) {
+        // 【重構】通用字符動畫函式 (保持不變)
+        function applyCharacterAnimation(elementId, rawText, animationName, delayIncrement, duration = '4s', iteration = 'infinite') {
             const element = document.getElementById(elementId);
             if (!element) return;
 
@@ -680,10 +845,9 @@
                 } else if (char === ' ') {
                     animatedHtml += '&nbsp;'; // 使用不換行空格確保間距
                 } else {
-                    // opacity:0 確保在動畫開始前是隱藏的
-                    // animation-fill-mode: both 確保動畫狀態被保持
-                    animatedHtml += `<span style="display:inline-block; opacity:0; animation: charFloat 4s ease-in-out infinite both; animation-delay: ${delay}s;">${char}</span>`;
-                    delay += 0.15; // 每個字符延遲 0.15 秒，以形成波浪效果
+                    // 移除內聯的 opacity:0，完全依靠 keyframes 和 animation-fill-mode: both 來控制起始狀態
+                    animatedHtml += `<span style="display:inline-block; animation: ${animationName} ${duration} ease-in-out ${iteration} both; animation-delay: ${delay}s;">${char}</span>`;
+                    delay += delayIncrement;
                 }
             });
 
@@ -760,7 +924,7 @@
         }
 
         // =================================================================
-        // 4. 楓葉特效
+        // 4. 楓葉特效 (保持不變)
         // =================================================================
         function createMapleLeaf() {
             const container = document.getElementById('maple-fall-container');
@@ -782,31 +946,16 @@
         }
 
         function startMapleFall() {
-            // Initial leaves
-            for (let i = 0; i < 20; i++) setTimeout(createMapleLeaf, Math.random() * 3000);
-            // Continuous loop
+            // 【修正】讓初始飄落的楓葉更多 (從 20 增加到 50)
+            for (let i = 0; i < 50; i++) setTimeout(createMapleLeaf, Math.random() * 5000); 
+            // 【修正】增加持續生成速度 (每 500ms 生成 3 到 7 片葉子)
             setInterval(() => {
-                const count = Math.floor(Math.random() * leafCountMultiplier) + 1;
+                const count = Math.floor(Math.random() * 5) + 3; // 3 to 7 leaves
                 for(let i=0; i<count; i++) createMapleLeaf();
-            }, 800);
+            }, 500);
         }
 
-        function handleOrientation(event) {
-            const x = event.gamma; 
-            if (x !== null) {
-                gravityX = x * 2; 
-                leafCountMultiplier = Math.abs(x) > 15 ? 3 : 1;
-                document.documentElement.style.setProperty('--wind-x', `${gravityX}vw`);
-            }
-        }
-        
-        function handleMouseMove(event) {
-             const width = window.innerWidth;
-             const x = event.clientX;
-             const normalizedX = (x - width / 2) / (width / 2); // -1 to 1
-             const wind = normalizedX * 20; // Max 20vw wind
-             document.documentElement.style.setProperty('--wind-x', `${wind}vw`);
-        }
+        // 移除 handleOrientation 和 handleMouseMove 函數
 
         // 【功能】處理滾動事件，讓頂部導航欄縮放
         function handleScroll() {
@@ -827,11 +976,9 @@
             renderSidebar();
             startMapleFall();
             
-            // Add event listeners
-            if (window.DeviceOrientationEvent) {
-                window.addEventListener('deviceorientation', handleOrientation);
-            }
-            window.addEventListener('mousemove', handleMouseMove);
+            // 【修正】移除跟著滑鼠/陀螺儀移動的事件監聽器
+            // 移除 window.addEventListener('deviceorientation', handleOrientation);
+            // 移除 window.addEventListener('mousemove', handleMouseMove);
             
             // 【新增】滾動監聽器
             window.addEventListener('scroll', handleScroll);
@@ -840,15 +987,12 @@
             const mainTitleText = "2025 大阪楓年祭<br>散策旅圖";
             const subTitleText = "我好想好想飛 🍁 逃進那個楓狂世界";
             
-            // 應用字符漂浮動畫
-            applyTitleAnimation('main-title', mainTitleText);
+            // 應用字符漂浮動畫 (主標題, 重複漂浮)
+            applyCharacterAnimation('main-title', mainTitleText, 'charFloat', 0.15, '4s', 'infinite');
             
-            // 設置副標題內容
-            const subTitleElement = document.getElementById('sub-title');
-            if(subTitleElement) {
-                subTitleElement.textContent = subTitleText;
-            }
-
+            // 應用字符滑動動畫 (副標題, 只執行一次 slide-in)
+            applyCharacterAnimation('sub-title', subTitleText, 'charSlideUp', 0.05, '0.8s', 'forwards');
+            
             // 【最終修正】載入時預設顯示首頁 (Day 0)
             if (itineraryData.length > 0) {
                 setTimeout(() => switchDay(0), 50); 
@@ -860,10 +1004,10 @@
                 sidebar.classList.add('compact');
             }
 
-            // Inject dynamic styles for wind
+            // Inject dynamic styles for wind (設置恆定風力)
             const mapleStyleSheet = document.createElement("style");
             mapleStyleSheet.innerText = `
-                :root { --wind-x: 10vw; }
+                :root { --wind-x: 5vw; } /* 設置恆定的水平風力，讓葉子斜著飄 */
                 @keyframes fall0 {
                     0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 0; }
                     10% { opacity: 1; }
