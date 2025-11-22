@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025 大阪楓年祭散策旅圖DAY7</title>
+    <title>2025 大阪楓年祭散策旅圖</title>
     <!-- 引入 Tailwind CSS 確保響應式與美觀 -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -42,8 +42,14 @@
         }
         
         /* 滾動後副標題字體縮小 */
-        .header-scrolled p {
+        .header-scrolled .subtitle-text {
             font-size: 0.875rem; /* text-sm 尺寸 */
+        }
+
+        /* 滾動後新標語縮小 */
+        .header-scrolled .slogan-text {
+            font-size: 0.75rem; /* 縮小到 text-xs 尺寸 */
+            margin-top: 0.1rem !important;
         }
 
         /* 2. 【液態玻璃/磨砂效果】 */
@@ -57,17 +63,52 @@
             overflow: hidden; 
         }
         
-        /* 3. 【光暈邊框效果】 (替代旋轉光暈) */
-
-        /* 移除 ::before 旋轉光暈 */
-        .section-card::before {
+        /* 3. 【光暈邊緣環繞動畫 - 呼吸效果】 */
+        
+        /* 移除旋轉光暈 */
+        .section-card::after {
             display: none;
         }
 
-        .section-card:hover {
-            transform: translateY(-5px) scale(1.01);
+        /* 呼吸動畫定義 */
+        @keyframes pulse-glow {
+            0% { 
+                box-shadow: 
+                    0 4px 12px rgba(0, 0, 0, 0.1), 
+                    0 0 8px var(--shadow-color),
+                    0 0 16px var(--shadow-color);
+            }
+            50% { 
+                box-shadow: 
+                    0 6px 16px rgba(0, 0, 0, 0.2), 
+                    0 0 12px var(--shadow-color),
+                    0 0 24px var(--shadow-color);
+            }
+            100% { 
+                box-shadow: 
+                    0 4px 12px rgba(0, 0, 0, 0.1), 
+                    0 0 8px var(--shadow-color),
+                    0 0 16px var(--shadow-color);
+            }
         }
         
+        /* 應用到區塊 */
+        .section-card-colored {
+            /* 應用呼吸動畫 */
+            animation: pulse-glow 3s infinite alternate ease-in-out;
+        }
+
+        .section-card-colored:hover {
+            transform: translateY(-5px) scale(1.01);
+            /* 懸停時，停止呼吸動畫並應用穩定的、更強的光暈 */
+            animation: none; 
+            box-shadow: 
+                0 6px 16px rgba(0, 0, 0, 0.2), 
+                0 0 15px var(--shadow-color),
+                0 0 30px var(--shadow-color) !important; 
+        }
+
+
         /* New Interactive Animation: Header Glow/Scale */
         .header-bg-fixed:hover {
             transform: scale(1.005);
@@ -91,7 +132,7 @@
         }
         
         /* 4. 【彩虹七色邊框和標題顏色】 */
-        /* 顏色定義 - 使用 HEX 顏色，簡化為單個變量 */
+        /* 顏色定義 */
         .color-red { --main-color: #dc2626; --shadow-color: #ef4444; }
         .color-orange { --main-color: #ea580c; --shadow-color: #f97316; }
         .color-yellow { --main-color: #d97706; --shadow-color: #f59e0b; }
@@ -99,27 +140,6 @@
         .color-blue { --main-color: #2563eb; --shadow-color: #3b82f6; }
         .color-indigo { --main-color: #4f46e5; --shadow-color: #6366f1; }
         .color-sky { --main-color: #0ea5e9; --shadow-color: #38bdf8; }
-
-        /* 應用到區塊 */
-        .section-card-colored {
-            border-left-color: var(--main-color) !important;
-            border-left-width: 8px; /* 確保邊框維持寬度 */
-            
-            /* 新增光暈：外圍多層次陰影，使用 --shadow-color */
-            box-shadow: 
-                0 4px 12px rgba(0, 0, 0, 0.1), /* 基礎陰影 */
-                0 0 10px var(--shadow-color), /* 基礎光暈 */
-                0 0 20px var(--shadow-color) !important; /* 更大的光暈層 */
-        }
-
-        .section-card-colored:hover {
-            transform: translateY(-5px) scale(1.01);
-            /* 懸停時光暈增強 */
-            box-shadow: 
-                0 6px 16px rgba(0, 0, 0, 0.2), 
-                0 0 15px var(--shadow-color),
-                0 0 30px var(--shadow-color) !important; 
-        }
 
         .text-color-main {
             color: var(--main-color) !important;
@@ -248,7 +268,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             const titleH1 = document.getElementById('main-title');
             if (titleH1) {
-                const text = titleH1.textContent;
+                // *** 關鍵修改：先移除文字兩端和中間的多餘空格 ***
+                let text = titleH1.textContent.trim().replace(/\s+/g, '');
                 titleH1.textContent = ''; // 清除原始文字
                 
                 for (let i = 0; i < text.length; i++) {
@@ -334,10 +355,14 @@
     <!-- 【置頂 Header 區塊】 (Z-index 50) -->
     <div class="header-bg-fixed text-white text-center py-4 px-6 md:py-6 md:px-10 rounded-b-xl shadow-lg" id="main-header">
         <h1 class="text-3xl md:text-5xl font-extrabold mb-1" id="main-title">
-            2025 大阪楓年祭散策旅圖DAY7
+            2025大阪楓年祭散策旅圖
         </h1>
-        <p class="text-lg md:text-xl font-light opacity-90">
-            神戶旅遊資訊彙整
+        <p class="text-lg md:text-xl font-light opacity-90 subtitle-text">
+            DAY7/神戶旅遊資訊彙整
+        </p>
+        <!-- 新增小標題 -->
+        <p class="text-sm md:text-base font-light opacity-80 mt-1 slogan-text" style="color: #fed7aa; text-shadow: 0 0 5px rgba(255, 158, 11, 0.5);">
+            我好想好想飛 🍁 逃進那個楓狂世界
         </p>
     </div>
 
@@ -345,7 +370,7 @@
     <main class="container mx-auto p-4 md:p-8 space-y-12 relative z-10 pt-40 md:pt-44"> 
 
         <!-- 0. 導航與步行路線 - 紅色 -->
-        <section class="section-card section-card-colored color-red p-6 border-l-8">
+        <section class="section-card section-card-colored color-red p-6">
             <div class="map-header-container">
                 <h2 class="text-2xl font-bold text-color-main fade-in-up">📌 0. 步行路線導航</h2>
                 <a href="https://maps.app.goo.gl/eaWfKL72iEAjsi5w7" target="_blank" 
@@ -360,7 +385,7 @@
 
 
         <!-- 1. 三宮中心街 (服飾與用品) - 橙色 -->
-        <section class="section-card section-card-colored color-orange p-6 border-l-8">
+        <section class="section-card section-card-colored color-orange p-6">
             <div class="map-header-container">
                 <h2 class="text-3xl font-bold text-color-main fade-in-up">🛍️ 1. 三宮中心街 (服飾/用品)</h2>
                 <a href="https://www.google.com/maps/search/?api=1&query=神戶+三宮中心街" target="_blank" class="btn-google-map">
@@ -378,7 +403,7 @@
         </section>
 
         <!-- 2. 元町商店街 (餐飲重點) - 黃色 -->
-        <section class="section-card section-card-colored color-yellow p-6 border-l-8">
+        <section class="section-card section-card-colored color-yellow p-6">
             <div class="map-header-container">
                 <h2 class="text-3xl font-bold text-color-main fade-in-up">🍞 2. 元町商店街 (美食與甜點)</h2>
                 <a href="https://www.google.com/maps/search/?api=1&query=神戶+元町商店街" target="_blank" class="btn-google-map">
@@ -421,7 +446,7 @@
         </section>
 
         <!-- 3. 臨海樂園 (Harborland) 景點 - 綠色 -->
-        <section class="section-card section-card-colored color-green p-6 border-l-8">
+        <section class="section-card section-card-colored color-green p-6">
             <div class="map-header-container">
                 <h2 class="text-3xl font-bold text-color-main fade-in-up">🚢 3. 臨海樂園 (Harborland) 景點</h2>
                 <a href="https://www.google.com/maps/search/?api=1&query=神戶+臨海樂園" target="_blank" class="btn-google-map">
@@ -448,7 +473,7 @@
         </section>
 
         <!-- 4. 購物商場 (Mosaic & umie) - 藍色 -->
-        <section class="section-card section-card-colored color-blue p-6 border-l-8">
+        <section class="section-card section-card-colored color-blue p-6">
             <div class="map-header-container">
                 <h2 class="text-3xl font-bold text-color-main fade-in-up">🛍️ 4. 購物商場 (Mosaic & umie)</h2>
                 <a href="https://www.google.com/maps/search/?api=1&query=神戶+umie+Mosaic" target="_blank" class="btn-google-map">
@@ -469,7 +494,7 @@
         </section>
         
         <!-- 6. 馬賽克摩天輪 (Mosaic Ferris Wheel) - 紫色 -->
-        <section class="section-card section-card-colored color-indigo p-6 border-l-8">
+        <section class="section-card section-card-colored color-indigo p-6">
             <div class="map-header-container">
                 <h2 class="text-3xl font-bold text-color-main fade-in-up">🎡 6. 馬賽克摩天輪 (夜景必備)</h2>
                 <a href="https://www.google.com/maps/search/?api=1&query=神戶+馬賽克摩天輪" target="_blank" class="btn-google-map">
@@ -492,7 +517,7 @@
         </section>
 
         <!-- 7. 郵輪 (Cruise) - 淺藍色 (新顏色) -->
-        <section class="section-card section-card-colored color-sky p-6 border-l-8">
+        <section class="section-card section-card-colored color-sky p-6">
             <div class="map-header-container">
                 <h2 class="text-3xl font-bold text-color-main fade-in-up">🛳️ 7. 神戶港郵輪資訊</h2>
                 <a href="https://maps.app.goo.gl/jsjhMQw5ygdG3jrV9" target="_blank" class="btn-google-map">
