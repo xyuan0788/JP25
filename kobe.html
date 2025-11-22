@@ -6,6 +6,7 @@
     <title>2025 大阪楓年祭散策旅圖</title>
     <!-- 引入 Tailwind CSS 確保響應式與美觀 -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&display=swap');
         body {
@@ -61,76 +62,80 @@
             position: relative; 
             border-radius: 12px;
             overflow: hidden; 
-        }
-        
-        /* 3. 【光暈邊緣環繞動畫 - 呼吸效果】 */
-        
-        /* 移除旋轉光暈 */
-        .section-card::after {
-            display: none;
+            padding: 0; /* 移除 padding，由子元素控制 */
+            margin-bottom: 2rem; /* 恢復基礎間距 */
+            z-index: 10; /* 確保卡片在連線之上 */
         }
 
-        /* 呼吸動畫定義 */
+        /* 3. 【光暈邊緣環繞動畫 - 呼吸效果】 */
+        
+        /* 呼吸動畫定義 - 最終且正確的呼吸效果 */
         @keyframes pulse-glow {
             0% { 
                 box-shadow: 
                     0 4px 12px rgba(0, 0, 0, 0.1), 
-                    0 0 8px var(--shadow-color),
-                    0 0 16px var(--shadow-color);
+                    0 0 12px var(--shadow-color), /* 基礎光暈 */
+                    0 0 24px var(--shadow-color); 
             }
             50% { 
                 box-shadow: 
                     0 6px 16px rgba(0, 0, 0, 0.2), 
-                    0 0 12px var(--shadow-color),
-                    0 0 24px var(--shadow-color);
+                    0 0 18px var(--shadow-color), /* 亮度提升 */
+                    0 0 36px var(--shadow-color); 
             }
             100% { 
                 box-shadow: 
                     0 4px 12px rgba(0, 0, 0, 0.1), 
-                    0 0 8px var(--shadow-color),
-                    0 0 16px var(--shadow-color);
+                    0 0 12px var(--shadow-color),
+                    0 0 24px var(--shadow-color);
             }
         }
         
         /* 應用到區塊 */
         .section-card-colored {
-            /* 應用呼吸動畫 */
+            position: relative;
+            /* 重新應用呼吸動畫 */
             animation: pulse-glow 3s infinite alternate ease-in-out;
+            /* 確保卡片有一個基礎的 box-shadow，以防動畫未載入 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-
+        
         .section-card-colored:hover {
-            transform: translateY(-5px) scale(1.01);
-            /* 懸停時，停止呼吸動畫並應用穩定的、更強的光暈 */
+            transform: translateY(-3px); /* 輕微懸停效果 */
+            /* 懸停時應用穩定的光暈 */
             animation: none; 
             box-shadow: 
                 0 6px 16px rgba(0, 0, 0, 0.2), 
-                0 0 15px var(--shadow-color),
-                0 0 30px var(--shadow-color) !important; 
+                0 0 22px var(--shadow-color), 
+                0 0 45px var(--shadow-color) !important; 
         }
 
-
-        /* New Interactive Animation: Header Glow/Scale */
-        .header-bg-fixed:hover {
-            transform: scale(1.005);
-            background-color: #c2410c; /* 懸停時顏色更亮 */
-        }
-        .header-bg-fixed h1, .header-bg-fixed p {
-            transition: all 0.5s ease-in-out; /* 確保內容過渡平滑 */
-        }
-        .header-bg-fixed:hover h1 {
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.9);
-        }
-
-        /* 地圖按鈕的基礎顏色 */
-        .btn-map {
-             background-color: #c2410c;
-             transition: background-color 0.3s, transform 0.1s;
-        }
-        .btn-map:hover {
-            background-color: #f97316;
-            transform: scale(1.02);
+        /* --- 內容動態浮現動畫 --- */
+        @keyframes slide-up {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
         }
         
+        /* 應用到內部的內容項 */
+        .content-inner > * {
+            opacity: 0;
+            animation: slide-up 0.4s ease-out forwards;
+            animation-delay: var(--content-delay, 0s); /* 延遲由 JS 設置 */
+        }
+        
+        /* 標題脈衝動畫 */
+        @keyframes icon-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .map-header-container h2 .icon {
+            display: inline-block;
+            animation: icon-pulse 1.5s ease-in-out infinite;
+        }
+
+
         /* 4. 【彩虹七色邊框和標題顏色】 */
         /* 顏色定義 */
         .color-red { --main-color: #dc2626; --shadow-color: #ef4444; }
@@ -147,8 +152,6 @@
         /* 應用到小標題 */
         .text-color-sub {
             color: var(--main-color) !important;
-            /* 讓小標題也有輕微光暈 */
-            text-shadow: 0 0 5px rgba(var(--shadow-color-rgb, 0, 0, 0), 0.2);
         }
 
         /* 3. 【字元浮動動畫】 */
@@ -156,60 +159,51 @@
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-8px); } /* 上下浮動 8px */
         }
-
-        .char-span {
-            display: inline-block;
+        
+        .char-span { 
+            display: inline-block; 
+            /* 重新啟用浮動動畫 */
             animation: float-wave 2s ease-in-out infinite;
             animation-delay: var(--delay);
-            white-space: pre; 
+            white-space: pre;
         }
         
-        /* 刪除楓葉動畫 CSS 區塊 */
+        /* 隱藏楓葉動畫 CSS 區塊 */
         .leaves-container { display: none; }
         
-        /* Section Title Fade-in Animation */
-        @keyframes fadeInUp {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in-up {
-            opacity: 0;
-            animation: fadeInUp 0.6s ease-out forwards;
-            /* 讓每個區塊標題有不同的延遲，滾動時逐一彈出 */
-            animation-delay: var(--section-delay); 
-        }
+        /* --- 內容樣式 --- */
         
-        /* New Interactive Animation: Table Row Hover */
-        .time-table-container table tbody tr:hover td {
-            background-color: #ffedd5; /* 淺橘色背景強調 */
-            box-shadow: 0 0 5px rgba(217, 119, 6, 0.4);
-        }
-        .time-table-container table tbody tr td {
-            transition: background-color 0.3s, box-shadow 0.3s;
+        .content-inner {
+            background-color: #fffbf5; /* 淺米色背景，讓內容區塊有統一感 */
+            padding: 1rem 1.5rem; /* 垂直填充 */
+            border-radius: 8px; /* 內圓角 */
         }
 
-        /* 地圖按鈕樣式 */
+        /* 標題與按鈕佈局 */
         .map-header-container {
             display: flex; /* 啟用 Flex 佈局 */
             justify-content: space-between; /* 標題和按鈕分別靠左右 */
             align-items: center; /* 垂直居中對齊 */
-            margin-bottom: 0.5rem; /* 修正標題與內容間距 */
+            padding: 1rem 1.5rem; /* 標題區塊的邊距，與 content-inner 搭配 */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* 分隔線 */
+            transition: background-color 0.2s;
         }
-        
-        /* 內容項目佈局：確保文字和內嵌按鈕對齊 */
+
+        /* 內容項目佈局 */
         .map-content-item {
             display: flex;
-            justify-content: space-between; /* 內容文字與按鈕靠左右對齊 */
-            align-items: center; /* 垂直居中 */
-            width: 100%; /* 佔滿空間 */
-            padding-bottom: 0.5rem;
-            border-bottom: 1px dashed rgba(245, 158, 11, 0.1); /* 視覺分隔線，低透明度 */
+            justify-content: space-between; 
+            align-items: center; 
+            width: 100%; 
+            padding: 0.4rem 0; 
+            border-bottom: 1px dashed rgba(245, 158, 11, 0.1); 
         }
         .map-content-item:last-child {
             border-bottom: none;
             padding-bottom: 0;
         }
-
+        
+        /* --- 地圖按鈕樣式 (內嵌) --- */
         .btn-google-map {
             display: inline-flex;
             align-items: center;
@@ -219,8 +213,8 @@
             border-radius: 9999px;
             font-size: 0.875rem;
             font-weight: 600;
-            flex-shrink: 0; /* 防止按鈕被擠壓 */
-            margin-left: 1rem; /* 與文字保持間距 */
+            flex-shrink: 0; 
+            margin-left: 1rem; 
             transition: background-color 0.2s;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -228,17 +222,42 @@
             background-color: #3b78e7;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
+
+        /* 彈窗樣式 (維持不變) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; justify-content: center; align-items: center;
+            z-index: 100; backdrop-filter: blur(4px);
+        }
+        @keyframes pop-in { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } 80% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1); } }
+        @keyframes pop-out-exit { 0% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(-50%, -50%) scale(1.25); opacity: 0; } }
+        .modal-content {
+            background-color: #fffbf5; padding: 2.5rem; border-radius: 12px; text-align: center; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); max-width: 90%; font-family: 'Noto Serif TC', serif;
+            transform: translate(-50%, -50%); position: absolute; top: 50%; left: 50%; opacity: 0;
+        }
+        .animate-pop-in { animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-pop-out-exit { animation: pop-out-exit 0.3s ease-out forwards; }
+        .modal-actions button { padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 600; transition: all 0.2s, box-shadow 0.3s, transform 0.1s; margin: 0 0.5rem; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
+        .modal-actions button:hover { transform: scale(1.05); }
+        .btn-confirm { background-color: #dc2626; color: white; }
+        .btn-confirm:hover { background-color: #b91c1c; box-shadow: 0 0 10px rgba(220, 38, 38, 0.6); }
+        .btn-cancel { background-color: #FFFFFF; color: #4a4a4a; border: 1px solid #d1d5db; }
+        .btn-cancel:hover { background-color: #f3f4f6; color: #333333; box-shadow: 0 0 10px rgba(150, 150, 150, 0.4); }
         
-        /* 郵輪表格線條修正：讓線條稍稍出現 */
+        /* 郵輪表格線條 */
         .time-table-container table {
             width: 100%;
             border-collapse: collapse;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             border-radius: 8px;
             overflow: hidden;
+            background-color: #fff;
         }
         .time-table-container th {
-            background-color: #0ea5e9; /* Sky 500 */
+            background-color: var(--main-color, #0ea5e9);
             color: white;
             padding: 0.75rem;
             text-align: left;
@@ -246,12 +265,34 @@
         }
         .time-table-container td {
             padding: 0.75rem;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1); /* 輕微的灰色線條 */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1); 
             vertical-align: top;
         }
         .time-table-container tr:last-child td {
             border-bottom: none;
         }
+
+        /* 導航大按鈕樣式 */
+        .btn-full-width-map {
+            width: 100%;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            background-color: #f97316; /* 橙色強調 */
+            color: white;
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700;
+            padding: 0.75rem 0; /* py-3 px-0 */
+            border-radius: 8px;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            display: block;
+            text-align: center;
+        }
+        .btn-full-width-map:hover {
+            background-color: #ea580c; /* 深橙色 */
+            transform: translateY(-1px);
+        }
+
     </style>
     
     <script>
@@ -263,29 +304,28 @@
             const b = bigint & 255;
             return [r, g, b];
         }
-
-        // JS 腳本 1: 處理字元浮動動畫
+        
+        // JS 腳本 1: 處理字元浮動動畫 (Header)
         document.addEventListener('DOMContentLoaded', () => {
             const titleH1 = document.getElementById('main-title');
             if (titleH1) {
-                // *** 關鍵修改：先移除文字兩端和中間的多餘空格 ***
+                // 重新啟用浮動動畫的邏輯和延遲
                 let text = titleH1.textContent.trim().replace(/\s+/g, '');
-                titleH1.textContent = ''; // 清除原始文字
+                titleH1.textContent = ''; 
                 
                 for (let i = 0; i < text.length; i++) {
                     const char = text[i];
                     const span = document.createElement('span');
                     span.classList.add('char-span');
                     span.textContent = char === ' ' ? '\u00A0' : char; 
-                    // 每個字元間隔 0.5s 延遲
-                    span.style.setProperty('--delay', (i * 0.5) + 's');
+                    span.style.setProperty('--delay', (i * 0.15) + 's'); /* 調整延遲時間以達到平滑錯位 */
                     titleH1.appendChild(span);
                 }
             }
 
-            // JS 腳本 2: 處理滾動縮小和透明化
+            // JS 腳本 2: 處理滾動縮小和透明化 (Header)
             const header = document.getElementById('main-header');
-            const scrollThreshold = 80; // 滾動超過 80px 觸發縮小
+            const scrollThreshold = 80; 
 
             function handleScroll() {
                 if (window.scrollY > scrollThreshold) {
@@ -296,10 +336,9 @@
             }
 
             window.addEventListener('scroll', handleScroll);
-            // 頁面載入時檢查初始滾動位置
             handleScroll(); 
             
-            // JS 腳本 3: 處理區塊標題進入動畫 (Fade-in Up) & 光暈初始化
+            // JS 腳本 3: 處理光暈和內容逐項彈出動畫
             const colorDefinitions = [
                 { selector: '.color-red', shadowHex: '#ef4444' },
                 { selector: '.color-orange', shadowHex: '#f97316' },
@@ -310,302 +349,424 @@
                 { selector: '.color-sky', shadowHex: '#38bdf8' }
             ];
 
-            // 將所有 color-class 設置 CSS 變數，用於光暈
             colorDefinitions.forEach(def => {
                 const elements = document.querySelectorAll(def.selector);
                 const rgb = hexToRgb(def.shadowHex);
                 elements.forEach(el => {
-                    // 設置光暈顏色變量
                     el.style.setProperty('--shadow-color', def.shadowHex);
-                    // 設置 RGB 變量用於 text-shadow
                     el.style.setProperty('--shadow-color-rgb', `${rgb[0]}, ${rgb[1]}, ${rgb[2]}`);
                 });
             });
 
+            // 內容逐項彈出 (Content Stagger)
             const observer = new IntersectionObserver((entries) => {
-                let delayCounter = 0;
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        // 讓每個區塊標題有漸進的動畫延遲
-                        entry.target.style.setProperty('--section-delay', (delayCounter * 0.1) + 's');
-                        entry.target.classList.add('fade-in-up');
-                        observer.unobserve(entry.target); // 只執行一次
-                        delayCounter++;
+                        const contentInner = entry.target.querySelector('.content-inner');
+                        if (contentInner) {
+                            let delayCounter = 0;
+                            // 針對內容容器內的所有直接子元素（h3, ul, div, p）應用延遲
+                            const children = contentInner.querySelectorAll('h3, ul, .map-content-item, .time-table-container, p, .btn-full-width-map');
+                            children.forEach(child => {
+                                child.style.setProperty('--content-delay', (delayCounter * 0.08) + 's');
+                                delayCounter++;
+                            });
+                        }
+                        // 移除觀察，只觸發一次
+                        observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.1 });
+            }, { threshold: 0.1 }); // 當卡片進入視窗 10% 時觸發
 
-            document.querySelectorAll('.section-card h2').forEach(h2 => {
-                observer.observe(h2);
+            document.querySelectorAll('.section-card').forEach(card => {
+                observer.observe(card);
             });
-            // H3 小標題也加入光暈樣式
-            document.querySelectorAll('.section-card h3').forEach(h3 => {
-                 h3.classList.add('text-color-sub');
-            });
+            
         });
+
         
-        // 輔助函數：生成 Google 地圖連結
-        function getMapUrl(query) {
-            return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent('神戶 ' + query)}`;
+        // --- 彈窗通用邏輯 (保留) ---
+        
+        let currentRedirectUrl = ''; 
+        
+        function openGenericModal(url, isMap = false) {
+            currentRedirectUrl = url;
+            const modalOverlay = document.getElementById('return-modal');
+            const modalContent = document.getElementById('modal-content-animated');
+            const title = document.getElementById('modal-title');
+            const message = document.getElementById('modal-message');
+            const confirmBtn = document.getElementById('btn-modal-confirm');
+            
+            if (isMap) {
+                title.textContent = '確認前往外部地圖網站？';
+                message.textContent = '您將開啟 Google 地圖連結';
+                confirmBtn.textContent = '確認前往';
+            } else { // 回到主頁面
+                title.textContent = '確認返回主頁面？';
+                message.textContent = '您將離開當前神戶行程頁面';
+                confirmBtn.textContent = '確認返回';
+            }
+
+            modalOverlay.style.display = 'flex';
+            
+            modalContent.classList.remove('animate-pop-out-exit'); 
+            modalContent.classList.add('animate-pop-in');
+            
+            modalContent.style.opacity = 1; 
         }
+
+        function showMainPageModal() {
+            openGenericModal('https://xyuan0788.github.io/JP25/', false);
+        }
+
+        function showMapModal(url) {
+            openGenericModal(url, true);
+        }
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('return-modal');
+            const modalContent = document.getElementById('modal-content-animated');
+            
+            modalContent.classList.remove('animate-pop-in');
+            modalContent.classList.add('animate-pop-out-exit');
+
+            modalContent.addEventListener('animationend', function handler(e) {
+                if (e.animationName === 'pop-out-exit') {
+                    modalOverlay.style.display = 'none';
+                    modalContent.classList.remove('animate-pop-out-exit');
+                    modalContent.style.opacity = 0; 
+                    modalContent.removeEventListener('animationend', handler);
+                }
+            });
+        }
+
+        function handleConfirmRedirect() {
+            if (currentRedirectUrl) {
+                window.open(currentRedirectUrl, '_blank');
+            }
+            closeModal(); 
+        }
+
     </script>
 </head>
 <body>
     
     <!-- 【置頂 Header 區塊】 (Z-index 50) -->
     <div class="header-bg-fixed text-white text-center py-4 px-6 md:py-6 md:px-10 rounded-b-xl shadow-lg" id="main-header">
-        <h1 class="text-3xl md:text-5xl font-extrabold mb-1" id="main-title">
-            2025大阪楓年祭散策旅圖
-        </h1>
-        <p class="text-lg md:text-xl font-light opacity-90 subtitle-text">
-            DAY7/神戶旅遊資訊彙整
-        </p>
-        <!-- 新增小標題 -->
-        <p class="text-sm md:text-base font-light opacity-80 mt-1 slogan-text" style="color: #fed7aa; text-shadow: 0 0 5px rgba(255, 158, 11, 0.5);">
-            我好想好想飛 🍁 逃進那個楓狂世界
-        </p>
+        <!-- Header 內容容器，用於左右對齊按鈕 -->
+        <div class="relative flex flex-col items-center justify-center w-full">
+            
+            <!-- 導航按鈕 (絕對定位於右上角) -->
+            <button onclick="showMainPageModal()" 
+                    class="absolute top-1/2 right-0 transform -translate-y-1/2 
+                           bg-red-700 hover:bg-red-800 text-white 
+                           text-sm font-semibold px-4 py-2 rounded-lg shadow-md 
+                           transition-colors duration-200 focus:outline-none">
+                回到行程主頁面
+            </button>
+
+            <!-- 標題群組 (居中) -->
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-1" id="main-title">
+                2025大阪楓年祭散策旅圖
+            </h1>
+            <p class="text-lg md:text-xl font-light opacity-90 subtitle-text">
+                DAY7/神戶旅遊資訊彙整
+            </p>
+            <!-- 新增小標題 -->
+            <p class="text-sm md:text-base font-light opacity-80 mt-1 slogan-text" style="color: #fed7aa; text-shadow: 0 0 5px rgba(255, 158, 11, 0.5);">
+                我好想好想飛 🍁 逃進那個楓狂世界
+            </p>
+        </div>
     </div>
 
-    <!-- 內容區塊：加大上邊距 (pt-40 md:pt-44) 以確保不被 Header 遮擋 -->
-    <main class="container mx-auto p-4 md:p-8 space-y-12 relative z-10 pt-40 md:pt-44"> 
-
-        <!-- 0. 導航與步行路線 - 紅色 -->
-        <section class="section-card section-card-colored color-red p-6">
-            <div class="map-header-container">
-                <h2 class="text-2xl font-bold text-color-main fade-in-up">📌 0. 步行路線導航</h2>
-                <a href="https://maps.app.goo.gl/eaWfKL72iEAjsi5w7" target="_blank" 
-                   class="btn-google-map">
-                   連結至Google地圖
-                </a>
+    <!-- 【彈窗 Modal 區塊】 (Z-index 100) -->
+    <div class="modal-overlay" id="return-modal">
+        <div class="modal-content" id="modal-content-animated">
+            <!-- 彈窗內容會由 JS 根據導航目標動態設定 -->
+            <div class="modal-title" id="modal-title"></div>
+            <p class="mb-6 text-gray-700" id="modal-message"></p>
+            <div class="modal-actions flex justify-center">
+                <!-- 繼續瀏覽/取消 (左 - 白色底) -->
+                <button onclick="closeModal()" class="btn-cancel">
+                    繼續瀏覽
+                </button>
+                <!-- 確認返回/前往 (右 - 紅色底) -->
+                <button onclick="handleConfirmRedirect()" class="btn-confirm" id="btn-modal-confirm">
+                    確認返回
+                </button>
             </div>
-            <p class="mb-2 text-gray-700">
-                建議您點擊上方連結 查閱參考步行路線 以確保時間效率
-            </p>
-        </section>
+        </div>
+    </div>
 
-
-        <!-- 1. 三宮中心街 (服飾與用品) - 橙色 -->
-        <section class="section-card section-card-colored color-orange p-6">
-            <div class="map-header-container">
-                <h2 class="text-3xl font-bold text-color-main fade-in-up">🛍️ 1. 三宮中心街 (服飾/用品)</h2>
-                <a href="https://www.google.com/maps/search/?api=1&query=神戶+三宮中心街" target="_blank" class="btn-google-map">
-                    連結至Google地圖
-                </a>
-            </div>
-            <div class="p-4 bg-yellow-50 rounded-lg space-y-3">
-                <div class="map-content-item">
-                    <span class="font-medium flex-grow"><span class="mr-3 text-2xl">🧦</span>TUTU ANNA 襪子店 服飾與襪子採購點</span>
+    <!-- 內容區塊：恢復垂直堆疊 -->
+    <main class="container mx-auto p-4 md:p-8 relative z-10 pt-40 md:pt-44 space-y-16"> 
+        
+        <!-- 1. 步行路線導航 - 紅色 -->
+        <section class="section-card color-red">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <!-- 將 h2 降級為 h3 樣式 -->
+                    <h3 class="text-xl font-semibold mb-0 text-color-main"><span class="icon">📌</span> 步行路線導航</h3>
+                    <!-- 移除原有的按鈕容器 -->
                 </div>
-                <div class="map-content-item">
-                    <span class="font-medium flex-grow"><span class="mr-3 text-2xl">☕</span>MUJI CAFÉ 無印良品風格的輕食與咖啡</span>
+                <div class="content-inner p-4 bg-red-50 rounded-lg">
+                    <!-- 新增長條狀按鈕 -->
+                    <a href="#" onclick="showMapModal('https://maps.app.goo.gl/eaWfKL72iEAjsi5w7'); return false;" 
+                       class="btn-full-width-map">
+                       查看詳細路線
+                    </a>
                 </div>
             </div>
         </section>
 
-        <!-- 2. 元町商店街 (餐飲重點) - 黃色 -->
-        <section class="section-card section-card-colored color-yellow p-6">
-            <div class="map-header-container">
-                <h2 class="text-3xl font-bold text-color-main fade-in-up">🍞 2. 元町商店街 (美食與甜點)</h2>
-                <a href="https://www.google.com/maps/search/?api=1&query=神戶+元町商店街" target="_blank" class="btn-google-map">
-                    連結至Google地圖
-                </a>
-            </div>
-            <div class="p-4 bg-yellow-50 rounded-lg">
-                <h3 class="text-xl font-semibold mb-3 text-color-main">重點店家</h3>
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium">🍞 Isuzuイスズベーカリー 元町店</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+Isuzuイスズベーカリー+元町店" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">☕️ taoca 神戶元町店 (咖啡)</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+taoca+神戶元町店" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🍙 ごちそう焼むすび おにまる 神戶元町 (烤飯糰)</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+ごちそう焼むすび+おにまる+神戸元町" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                </ul>
-                
-                <h3 class="text-xl font-semibold mt-4 mb-3 text-color-main">🍰 甜點與銘菓</h3>
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium mr-2">🧀 觀音屋 起司蛋糕 (Cheese Cake)</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+觀音屋+元町" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium mr-2">🍮 Frantz 魔法壺布丁</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+Frantz" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium mr-2">🍪 風月堂 元町本店 著名的「法蘭酥」</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+風月堂+元町本店" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                </ul>
+
+        <!-- 2. 三宮中心街 (服飾與用品) - 橙色 -->
+        <section class="section-card color-orange">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <h2 class="text-3xl font-bold text-color-main"><span class="icon">🛍️</span> 2. 三宮中心街 (服飾/用品)</h2>
+                    <div class="flex items-center">
+                        <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+三宮中心街')" class="btn-google-map">
+                            連結至Google地圖
+                        </button>
+                    </div>
+                </div>
+                <div class="content-inner">
+                    <div class="space-y-3">
+                        <div class="map-content-item">
+                            <span class="font-medium flex-grow"><span class="mr-3 text-2xl">🧦</span>TUTU ANNA 襪子店 服飾與襪子採購點</span>
+                        </div>
+                        <div class="map-content-item">
+                            <span class="font-medium flex-grow"><span class="mr-3 text-2xl">☕</span>MUJI CAFÉ 無印良品風格的輕食與咖啡</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- 3. 臨海樂園 (Harborland) 景點 - 綠色 -->
-        <section class="section-card section-card-colored color-green p-6">
-            <div class="map-header-container">
-                <h2 class="text-3xl font-bold text-color-main fade-in-up">🚢 3. 臨海樂園 (Harborland) 景點</h2>
-                <a href="https://www.google.com/maps/search/?api=1&query=神戶+臨海樂園" target="_blank" class="btn-google-map">
-                    連結至Google地圖
-                </a>
-            </div>
-            <div class="p-4 bg-green-50 rounded-lg space-y-3">
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium">⚓ 神戶海洋博物館</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+海洋博物館" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🗿 貓王雕像 世界僅有三座官方雕像之一</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🦒 蒼天之塔 高 8 米的長頸鹿雕塑</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🏞️ 景觀花園 廣闊的草坪與花壇</span>
-                    </li>
-                </ul>
+        <!-- 3. 元町商店街 (餐飲重點) - 黃色 -->
+        <section class="section-card color-yellow">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <h2 class="text-3xl font-bold text-color-main"><span class="icon">🍞</span> 3. 元町商店街 (美食與甜點)</h2>
+                    <div class="flex items-center">
+                        <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+元町商店街')" class="btn-google-map">
+                            連結至Google地圖
+                        </button>
+                    </div>
+                </div>
+                <div class="content-inner">
+                    <h3 class="text-xl font-semibold mb-3 text-color-main">重點店家</h3>
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium">🍞 Isuzuイスズベーカリー 元町店</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+Isuzuイスズベーカリー+元町店')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">☕️ taoca 神戶元町店 (咖啡)</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+taoca+神戶元町店')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🍙 ごちそう焼むすび おにまる 神戶元町 (烤飯糰)</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+ごちそう焼むすび+おにまる+神戸元町')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                    </ul>
+                    
+                    <h3 class="text-xl font-semibold mt-4 mb-3 text-color-main">🍰 甜點與銘菓</h3>
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium mr-2">🧀 觀音屋 起司蛋糕 (Cheese Cake)</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+觀音屋+元町')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium mr-2">🍮 Frantz 魔法壺布丁</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+Frantz')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium mr-2">🍪 風月堂 元町本店 著名的「法蘭酥」</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+風月堂+元町本店')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
 
-        <!-- 4. 購物商場 (Mosaic & umie) - 藍色 -->
-        <section class="section-card section-card-colored color-blue p-6">
-            <div class="map-header-container">
-                <h2 class="text-3xl font-bold text-color-main fade-in-up">🛍️ 4. 購物商場 (Mosaic & umie)</h2>
-                <a href="https://www.google.com/maps/search/?api=1&query=神戶+umie+Mosaic" target="_blank" class="btn-google-map">
-                    連結至Google地圖
-                </a>
+        <!-- 4. 臨海樂園 (Harborland) 景點 - 綠色 -->
+        <section class="section-card color-green">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <h2 class="text-3xl font-bold text-color-main"><span class="icon">🚢</span> 4. 臨海樂園 (Harborland) 景點</h2>
+                    <div class="flex items-center">
+                        <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+臨海樂園')" class="btn-google-map">
+                            連結至Google地圖
+                        </button>
+                    </div>
+                </div>
+                <div class="content-inner">
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium">⚓ 神戶海洋博物館</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+海洋博物館')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🗿 貓王雕像 世界僅有三座官方雕像之一</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🦒 蒼天之塔 高 8 米的長頸鹿雕塑</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🏞️ 景觀花園 廣闊的草坪與花壇</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            <div class="p-4 bg-blue-50 rounded-lg space-y-3">
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-bold">Mosaic 馬賽克廣場 & umie 百貨</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-bold">⛺ L-Breath 露營用品店 提供免稅服務</span>
-                        <a href="https://www.google.com/maps/search/?api=1&query=神戶+L-Breath" target="_blank" class="btn-google-map">連結至Google地圖</a>
-                    </li>
-                </ul>
+        </section>
+
+        <!-- 5. 購物商場 (Mosaic & umie) - 藍色 -->
+        <section class="section-card color-blue">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <h2 class="text-3xl font-bold text-color-main"><span class="icon">🛍️</span> 5. 購物商場 (Mosaic & umie)</h2>
+                    <div class="flex items-center">
+                        <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+umie+Mosaic')" class="btn-google-map">
+                            連結至Google地圖
+                        </button>
+                    </div>
+                </div>
+                <div class="content-inner">
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-bold">Mosaic 馬賽克廣場 & umie 百貨</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-bold">⛺ L-Breath 露營用品店 提供免稅服務</span>
+                            <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+L-Breath')" class="btn-google-map">連結至Google地圖</button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
         
         <!-- 6. 馬賽克摩天輪 (Mosaic Ferris Wheel) - 紫色 -->
-        <section class="section-card section-card-colored color-indigo p-6">
-            <div class="map-header-container">
-                <h2 class="text-3xl font-bold text-color-main fade-in-up">🎡 6. 馬賽克摩天輪 (夜景必備)</h2>
-                <a href="https://www.google.com/maps/search/?api=1&query=神戶+馬賽克摩天輪" target="_blank" class="btn-google-map">
-                    連結至Google地圖
-                </a>
-            </div>
-            <div class="p-4 bg-purple-50 rounded-lg space-y-3">
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium">🌟 特色 可享受神戶港、六甲山、神戶大橋的 360 度全景</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🎟️ 門票費用 800日圓/人 (3歲以上收費)</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">💖 備註 白天有麵包超人主題車廂 晚上推薦搭乘欣賞夜景</span>
-                    </li>
-                </ul>
+        <section class="section-card color-indigo">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <h2 class="text-3xl font-bold text-color-main"><span class="icon">🎡</span> 6. 馬賽克摩天輪 (夜景必備)</h2>
+                    <div class="flex items-center">
+                        <button onclick="showMapModal('https://www.google.com/maps/search/?api=1&query=神戶+馬賽克摩天輪')" class="btn-google-map">
+                            連結至Google地圖
+                        </button>
+                    </div>
+                </div>
+                <div class="content-inner">
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium">🌟 特色 可享受神戶港、六甲山、神戶大橋的 360 度全景</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🎟️ 門票費用 800日圓/人 (3歲以上收費)</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">💖 備註 白天有麵包超人主題車廂 晚上推薦搭乘欣賞夜景</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </section>
 
         <!-- 7. 郵輪 (Cruise) - 淺藍色 (新顏色) -->
-        <section class="section-card section-card-colored color-sky p-6">
-            <div class="map-header-container">
-                <h2 class="text-3xl font-bold text-color-main fade-in-up">🛳️ 7. 神戶港郵輪資訊</h2>
-                <a href="https://maps.app.goo.gl/jsjhMQw5ygdG3jrV9" target="_blank" class="btn-google-map">
-                    連結至Google地圖
-                </a>
-            </div>
-            <div class="p-4 bg-red-50 rounded-lg">
-                <!-- 御座船 安宅丸 -->
-                <h3 class="text-xl font-semibold mb-3 text-color-main">御座船 安宅丸 (約45分鐘航程)</h3>
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium">🎫 門票費用 1,700 円</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🚫 公休資訊 週一、二、四休</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🕒 首班時間 10:15 (每整點15分開船)</span>
-                    </li>
-                </ul>
-
-                <!-- 皇室公主號 (新增) -->
-                <h3 class="text-xl font-semibold mt-6 mb-3 text-color-main">皇室公主號 (Royal Princess)</h3>
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium">🎫 門票費用 1,700 円</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🚫 公休資訊 週三休</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🕒 首班時間 10:45 (每整點45分開船)</span>
-                    </li>
-                </ul>
-
-                <!-- boh boh KOBE號 (新增) -->
-                <h3 class="text-xl font-semibold mt-6 mb-3 text-color-main">boh boh KOBE號</h3>
-                <ul class="space-y-3 list-none p-0">
-                    <li class="map-content-item">
-                        <span class="font-medium">🎫 門票費用 2,200 円</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🚫 公休資訊 平日不固定休息 假日營業</span>
-                    </li>
-                    <li class="map-content-item">
-                        <span class="font-medium">🕒 首班時間 假日 11:00</span>
-                    </li>
-                </ul>
-
-
-                <h3 class="text-xl font-semibold mt-6 mb-3 text-color-main">🛳️ 船班時間 (12:00-16:00 區間)</h3>
-                <!-- START: 船班時間表格 -->
-                <div class="time-table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 25%;">時段</th>
-                                <th style="width: 75%;">船班列表</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>12:00 區間</td>
-                                <td>12:15 御座船<br>12:45 皇室公主號</td>
-                            </tr>
-                            <tr>
-                                <td>13:00 區間</td>
-                                <td>13:00 boh boh KOBE號 (假日)<br>13:45 皇室公主號</td>
-                            </tr>
-                            <tr>
-                                <td>14:00 區間</td>
-                                <td>14:15 御座船<br>14:45 皇室公主號</td>
-                            </tr>
-                            <tr>
-                                <td>15:00 區間</td>
-                                <td>15:00 boh boh KOBE號 (假日)<br>15:15 御座船<br>15:45 皇室公主號</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <section class="section-card color-sky">
+            <div class="section-card-colored">
+                <div class="map-header-container">
+                    <h2 class="text-3xl font-bold text-color-main"><span class="icon">🛳️</span> 7. 神戶港郵輪資訊</h2>
+                    <div class="flex items-center">
+                        <button onclick="showMapModal('https://maps.app.goo.gl/jsjhMQw5ygdG3jrV9')" class="btn-google-map">
+                            連結至Google地圖
+                        </button>
+                    </div>
                 </div>
-                <!-- END: 船班時間表格 -->
+                <div class="content-inner">
+                    <!-- 御座船 安宅丸 -->
+                    <h3 class="text-xl font-semibold mb-3 text-color-main">御座船 安宅丸 (約45分鐘航程)</h3>
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium">🎫 門票費用 1,700 円</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🚫 公休資訊 週一、二、四休</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🕒 首班時間 10:15 (每整點15分開船)</span>
+                        </li>
+                    </ul>
 
-                <p class="mt-4 text-sm text-gray-500 font-semibold">
-                    ❗ 注意 後續班次請參考現場或官方網站資訊
-                </p>
+                    <!-- 皇室公主號 (新增) -->
+                    <h3 class="text-xl font-semibold mt-6 mb-3 text-color-main">皇室公主號 (Royal Princess)</h3>
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium">🎫 門票費用 1,700 円</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🚫 公休資訊 週三休</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🕒 首班時間 10:45 (每整點45分開船)</span>
+                        </li>
+                    </ul>
+
+                    <!-- boh boh KOBE號 (新增) -->
+                    <h3 class="text-xl font-semibold mt-6 mb-3 text-color-main">boh boh KOBE號</h3>
+                    <ul class="space-y-3 list-none p-0">
+                        <li class="map-content-item">
+                            <span class="font-medium">🎫 門票費用 2,200 円</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🚫 公休資訊 平日不固定休息 假日營業</span>
+                        </li>
+                        <li class="map-content-item">
+                            <span class="font-medium">🕒 首班時間 假日 11:00</span>
+                        </li>
+                    </ul>
+
+
+                    <h3 class="text-xl font-semibold mt-6 mb-3 text-color-main">🛳️ 船班時間 (12:00-16:00 區間)</h3>
+                    <!-- START: 船班時間表格 -->
+                    <div class="time-table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 25%;">時段</th>
+                                    <th style="width: 75%;">船班列表</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>12:00 區間</td>
+                                    <td>12:15 御座船<br>12:45 皇室公主號</td>
+                                </tr>
+                                <tr>
+                                    <td>13:00 區間</td>
+                                    <td>13:00 boh boh KOBE號 (假日)<br>13:45 皇室公主號</td>
+                                </tr>
+                                <tr>
+                                    <td>14:00 區間</td>
+                                    <td>14:15 御座船<br>14:45 皇室公主號</td>
+                                </tr>
+                                <tr>
+                                    <td>15:00 區間</td>
+                                    <td>15:00 boh boh KOBE號 (假日)<br>15:15 御座船<br>15:45 皇室公主號</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- END: 船班時間表格 -->
+
+                    <p class="mt-4 text-sm text-gray-500 font-semibold">
+                        ❗ 注意 後續班次請參考現場或官方網站資訊
+                    </p>
+                </div>
             </div>
         </section>
-
     </main>
 
     <footer class="bg-gray-800 text-white p-6 mt-10 text-center relative z-10">
