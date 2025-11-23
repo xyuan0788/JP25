@@ -1034,9 +1034,8 @@
                         contentDiv.style.display = 'block';
                         renderItinerary(dayData);
                         
-                        // 滾動到內容區頂部，但不要完全頂著
-                        window.scrollTo({ top: contentDiv.offsetTop - 100, behavior: 'smooth' });
-                    }, 50); 
+                        
+                        
                 }
             }
             
@@ -1077,39 +1076,36 @@
             }, 500);
         }
 
-        // 【升級 2】處理滾動事件，讓頂部導航欄縮放，並控制主標題淡入淡出
-        function handleScroll() {
-            const sidebar = document.getElementById('sidebar');
-            const header = document.getElementById('main-header');
-            const scrollTop = window.scrollY;
-            const scrollThreshold = 100; // 滾動超過 100px 開始變化
+function handleScroll() {
+    const sidebar = document.getElementById('sidebar');
+    const header = document.getElementById('main-header');
+    const scrollTop = window.scrollY;
+    const scrollThreshold = 100;
 
-            // 1. 導航欄緊湊模式
-            if (scrollTop > 50) { // 稍微降低觸發點，讓導航欄更快縮小
-                sidebar.classList.add('compact');
-            } else {
-                sidebar.classList.remove('compact');
-            }
+    // 只要超過 40px 就縮小，不管是不是首頁
+    if (scrollTop > 40) {
+        sidebar.classList.add('compact');
+    } else {
+        sidebar.classList.remove('compact');
+    }
 
-            // 2. 主標題淡出/淡入控制
-            // 注意：只有在首頁 (currentDay === 0) 才會有淡出效果
-            if (header && currentDay === 0) { 
-                if (scrollTop > scrollThreshold) {
-                    // 向下滾動超過門檻，淡出主標題
-                    header.style.opacity = '0';
-                    header.style.transform = 'translateY(-30px)';
-                    header.style.pointerEvents = 'none';
-                } else {
-                    // 向上滾動或在頂部，淡入主標題
-                    const opacity = 1 - (scrollTop / scrollThreshold);
-                    header.style.opacity = Math.max(0, opacity);
-                    header.style.transform = `translateY(${(-scrollTop / 3)}px)`; // 輕微視差效果
-                    header.style.pointerEvents = 'auto';
-                }
-            }
-
-            lastScrollTop = scrollTop;
+    // 只有首頁才有主標題淡出
+    if (header && currentDay === 0) { 
+        if (scrollTop > scrollThreshold) {
+            header.style.opacity = '0';
+            header.style.transform = 'translateY(-30px)';
+            header.style.pointerEvents = 'none';
+        } else {
+            const opacity = 1 - (scrollTop / scrollThreshold);
+            header.style.opacity = Math.max(0, opacity);
+            header.style.transform = `translateY(${(-scrollTop / 3)}px)`;
+            header.style.pointerEvents = 'auto';
         }
+    }
+
+    lastScrollTop = scrollTop;
+}
+
 
         // =================================================================
         // 6. 客製化 Modal 函式
@@ -1181,3 +1177,4 @@
 </body>
 
 </html>
+
