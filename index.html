@@ -1,1183 +1,1678 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW" class="scroll-smooth">
 <head>
-    <link rel="icon" type="image/png" href="./JP.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2025大阪楓年祭散策旅圖</title>
-    <!-- 載入 Tailwind CSS -->
+    <title>tixCraft 拓元售票系統 - 玉山銀行 冠名贊助 五月天 2026 [ #5525+2 回到那一天 ] 25週年巡迴演唱會 台北站</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 載入 Noto Serif TC (明體) 字體 -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        /* 設定主要字體為明體，並加入優雅的襯線字體作為備用 */
-        body {
-            font-family: 'Noto Serif TC', 'Georgia', 'Times New Roman', Times, serif;
-            color: #333;
-            overflow-x: hidden; /* 防止滾動條 */
-            /* 楓葉色漸層背景動畫 */
-            background: linear-gradient(45deg, #fcf8f3, #fff5eb, #fff0e6, #fcece6);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
-
-        /* 【升級 3】美化滾動條，使用秋季配色 */
-        body::-webkit-scrollbar {
-            width: 8px;
-        }
-        body::-webkit-scrollbar-track {
-            background: #f9f0e1; /* 淺米色背景 */
-        }
-        body::-webkit-scrollbar-thumb {
-            background-color: #e53e3e; /* 楓葉紅 */
-            border-radius: 4px;
-            border: 2px solid #f9f0e1;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* 楓葉飄落特效的 CSS (保持不變) */
-        .maple-fall-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            z-index: 10;
-        }
-
-        .maple-leaf {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: #e53e3e; /* 楓葉紅 */
-            clip-path: polygon(50% 0%, 100% 30%, 80% 100%, 20% 100%, 0% 30%);
-            opacity: 0;
-        }
-
-        /* 【修正 1】大標題動態效果：確保文字顏色顯示，並改用金色光暈動畫 */
-        .animated-title {
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); 
-            color: #b91c1c; /* 確保文字顯示為實心楓葉紅 */
-            background: none; /* 移除背景漸變 */
-            -webkit-background-clip: unset; /* 移除剪裁 */
-            -webkit-text-fill-color: unset; /* 移除透明文字填充 */
-            background-size: 100% 100%;
-            animation: textGlow 4s linear infinite alternate; /* 替換為金色光暈閃爍 */
-        }
-        
-        /* 【新增】金色光暈閃爍動畫 Keyframe */
-        @keyframes textGlow {
-            0% { text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-            50% { text-shadow: 0 0 10px #f6ad55, 0 0 20px #fef3c7; } /* 加入金色光暈 */
-            100% { text-shadow: 2px 2px 4px rgba(0,0,0,0.2); }
-        }
-
-        /* 頂部 Header 滾動淡出動畫 (保持不變) */
-        @keyframes headerFadeOut {
-            to { opacity: 0; transform: translateY(-30px); pointer-events: none; }
-        }
-        @keyframes headerFadeIn {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        }
-
-        /* 標題文字個體漂浮動畫 */
-        @keyframes charFloat {
-            0%, 10% { transform: translateY(0) scale(1); opacity: 1; }
-            50% { transform: translateY(-12px) scale(1.05); opacity: 0.9; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
-        }
-        
-        /* 副標題字符滑動動畫 */
-        @keyframes charSlideUp {
-            0% { transform: translateY(20px) scale(0.9); opacity: 0; }
-            50% { transform: translateY(-2px); opacity: 1; }
-            100% { transform: translateY(0) scale(1); opacity: 1; }
-        }
-        
-        .animated-subtitle { opacity: 1; }
-        .flashing-border {
-            border: 3px solid transparent;
-            animation: flash 1.5s infinite alternate;
-        }
-
-        /* 新增：切換到日期頁面後的緊湊型標題動畫 */
-        .day-header-compact {
-            opacity: 0;
-            transform: translateY(-20px);
-            animation: headerSlideIn 0.5s ease-out forwards;
-        }
-
-        @keyframes headerSlideIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* 確保原本的元素在日曆模式下被隱藏 */
-        .hidden-content {
-            display: none !important;
-        }
-        
-        /* 讓 main-header 在日曆模式下與內容區有區隔 */
-        #main-header {
-            margin-bottom: 2rem;
-        }
-
-        /* ----------------------- 頂部導航欄 (Side Menu) - 液態玻璃 ----------------------- */
-        #sidebar {
-            position: fixed; top: 0; left: 0; width: 100%; height: auto; padding: 0.3rem 1rem; /* <-- 豬大哥改動：讓選單變扁 */
-            /* [液態玻璃效果] - 0.3 透明度 */
-            background-color: rgba(255, 255, 255, 0.3); 
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.6); 
-            
-            display: flex; flex-direction: row; align-items: center;
-            transition: all 0.2s ease; /* 加快收縮速度 */
-            overflow-x: auto; overflow-y: hidden; z-index: 50;
-            border-bottom: 1px solid rgba(229, 62, 62, 0.1); 
-        }
-
-        /* 滾動時的緊湊狀態 (讓頂部導航欄「伸縮自如」) */
-        #sidebar.compact {
-            padding-top: 0.1rem; padding-bottom: 0.1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.6);
-            justify-content: flex-start;
-        }
-        
-        /* 橫向滾動條樣式 (美化) */
-        #sidebar::-webkit-scrollbar { height: 6px; }
-        #sidebar::-webkit-scrollbar-thumb { background-color: #fca5a5; border-radius: 3px; }
-
-        .sidebar-item {
-            display: flex; align-items: center; padding: 0.5rem 1rem; cursor: pointer;
-            transition: all 0.3s ease; white-space: nowrap;
-            border-bottom: 4px solid transparent; 
-            margin-right: 0.75rem; 
-            margin-bottom: 0;
-        }
-
-        /* 滾動緊湊時，項目內邊距也跟著調整 */
-        #sidebar.compact .sidebar-item { padding: 0.3rem 0.5rem; }
-
-        .sidebar-item:hover {
-            background-color: #fff7ed; 
-            border-bottom-color: #fdba74; 
-        }
-
-        .sidebar-item.active {
-            background-color: #fff1f2; 
-            border-bottom-color: #e53e3e; 
-        }
-
-        .sidebar-icon-container {
-            min-width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; 
-            margin-right: 0.5rem; /* <-- 豬大哥改動：縮小圖示右側空間 */
-            border-radius: 50%; background-color: #f3f4f6;
-            transition: background-color 0.3s, margin-right 0.3s;
-        }
-
-        /* 1. 滾動時，移除 ICON 旁邊的空間 */
-        #sidebar.compact .sidebar-icon-container { margin-right: 0; }
-
-        .sidebar-text {
-            opacity: 1; transform: translateX(0); transition: all 0.3s ease; 
-            display: flex; flex-direction: column; min-width: 5rem; 
-        }
-
-        /* 2. 滾動時，徹底隱藏文字並移除佔用寬度 */
-        #sidebar.compact .sidebar-text {
-            opacity: 0; width: 0; min-width: 0; overflow: hidden;
-            padding: 0; pointer-events: none;
-        }
-
-        /* ----------------------- 行程內容區 - 液態玻璃 (豪華卷軸版) ----------------------- */
-        #itinerary-content {
-            width: 100%; max-width: 56rem;
-            
-            /* [液態玻璃效果] - 0.15 透明度 */
-            background-color: rgba(255, 255, 255, 0.15); 
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            
-            /* 【升級 1】金色底紋疊加，增加古樸感和亮度 */
-            background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px), 
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.2) 1px, transparent 1px);
-            background-size: 20px 20px;
-            
-            border: 1px solid rgba(255, 255, 255, 0.6); /* 淺色玻璃邊框 */
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 15px rgba(255, 215, 0, 0.4); /* 浮動陰影 + 輕微金邊 */
-            
-            padding: 2.5rem; border-radius: 1.5rem; margin-top: 2rem;
-            opacity: 0; transform: translateY(20px);
-            transition: opacity 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: none; 
-        }
-
-        /* 交通卡片專屬樣式 - 液態玻璃 */
-        .transport-card {
-            background: rgba(255, 255, 255, 0.85); /* 輕微玻璃背景 */
-            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-            border: 1px solid rgba(255, 255, 255, 0.9); /* 淺色邊框 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            padding: 1rem; border-radius: 0.75rem;
-            position: relative;
-        }
-
-        .transport-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15); /* 加強懸浮感 */
-        }
-
-        /* ----------------------- 交通線路視覺強化 ----------------------- */
-        .transport-line {
-            position: relative; height: 4px; 
-            background-color: #e53e3e; 
-            margin-top: 10px; flex-grow: 1;
-        }
-        
-        /* 路線移動符號動畫 - 這些都已經沒有實際內容，但保留 keyframes 以防萬一*/
-        @keyframes travelWave {
-            0% { opacity: 0; transform: translateX(-100%); }
-            25% { opacity: 1; transform: translateX(0%); }
-            75% { opacity: 1; transform: translateX(100%); }
-            100% { opacity: 0; transform: translateX(100%); }
-        }
-
-        /* 箭頭容器 */
-        .travel-wave-container {
-            position: absolute; top: 50%; left: 0; right: 0; height: 100%;
-            display: flex; align-items: center; justify-content: space-between;
-            overflow: hidden; pointer-events: none; z-index: 5;
-        }
-        
-        /* 箭頭/符號本體 CSS - 雖然 HTML 移除了，但保留 CSS 習慣 */
-        .travel-symbol {
-            color: #fef3c7; 
-            font-size: 2rem; 
-            font-weight: 700; position: absolute;
-            top: 50%; transform: translateY(-50%) translateX(-50%); 
-            animation: travelWave 5s ease-in-out infinite; 
-            text-shadow: 0 0 5px rgba(229, 62, 62, 0.5); 
-        }
-
-        .travel-symbol:nth-child(1) { animation-delay: 0s; }
-        .travel-symbol:nth-child(2) { animation-delay: 1.6s; } 
-        .travel-symbol:nth-child(3) { animation-delay: 3.2s; }
-
-        /* 飛機移動線 */
-        .flight-line {
-            position: relative; height: 4px; margin-top: 10px; flex-grow: 1;
-            background-image: repeating-linear-gradient(90deg, #9333ea, #9333ea 5px, transparent 5px, transparent 10px);
-        }
-        
-        /* 飛機符號 CSS - 雖然 HTML 移除了，但保留 CSS 習慣 */
-        .flight-symbol {
-            position: absolute; top: 50%;
-            transform: translateY(-50%) translateX(-50%);
-            font-size: 1.6rem; 
-            color: #c4b5fd; 
-            animation: travelWave 6s ease-in-out infinite; 
-        }
-
-        .flight-symbol:nth-child(1) { animation-delay: 0s; }
-        .flight-symbol:nth-child(2) { animation-delay: 2s; } 
-        .flight-symbol:nth-child(3) { animation-delay: 4s; }
-
-
-        /* 交通線路黃色標籤 */
-        .transport-label {
-            position: absolute; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); white-space: nowrap;
-            padding: 4px 12px; border-radius: 9999px; font-size: 0.8rem; font-weight: 700;
-            background-color: #fef08a; /* 亮黃色背景 */
-            color: #854d0e; /* 深棕色文字 */
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); 
-            max-width: 90%; text-overflow: ellipsis; overflow: hidden;
-            z-index: 10;
-        }
-
-        /* 路線圖樣式 (Timeline) - 內容卡片 - 液態玻璃 */
-        .timeline-content-card {
-            /* 讓背景顏色變成半透明，並加上模糊效果 */
-            background: rgba(255, 255, 255, 0.75); 
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            position: relative; 
-            overflow: visible; 
-        }
-        
-        /* ----------------------- 客製化 Modal 樣式 ----------------------- */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6); /* 深色背景 */
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            z-index: 1000;
-            display: none; /* 預設隱藏 */
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.show {
-            display: flex;
-            opacity: 1;
-        }
-        .modal-content {
-            background-color: rgba(255, 255, 255, 0.9); /* 液態玻璃淺色背景 */
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), 0 0 10px #e53e3e; /* 帶有楓紅光暈 */
-            max-width: 400px;
-            width: 90%;
-            transform: scale(0.9);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .modal-overlay.show .modal-content {
-            transform: scale(1);
-        }
-        /* ----------------------- 其他樣式維持不變 ----------------------- */
-        .main-container {
-            margin-left: 0; 
-            padding-top: 6rem; 
-            transition: none; 
-            min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
-            padding-bottom: 4rem; 
-        }
-        
-        #itinerary-content.show {
-            opacity: 1; transform: translateY(0); display: block;
-        }
-
-        .timeline-container { position: relative; margin-top: 2rem; }
-        /* 讓線條有過渡效果，這樣它伸長縮短時會比較平滑 */
-        .timeline-line { position: absolute; left: 23px; top: 24px; width: 2px; background-color: #fed7aa; z-index: 0; transition: height 0.5s ease-in-out; } 
-        .timeline-item { position: relative; padding-left: 4.5rem; padding-bottom: 2.5rem; min-height: 6rem; }
-        .timeline-icon {
-            position: absolute; left: 0; top: 0; width: 3rem; height: 3rem; background-color: white;
-            border-radius: 1rem; border: 2px solid #fed7aa; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            display: flex; align-items: center; justify-content: center; z-index: 10; transition: transform 0.3s ease-in-out;
-        }
-        .timeline-item:hover .timeline-icon { transform: scale(1.1) rotate(-5deg); border-color: #fca5a5; }
-
-        .timeline-time-box {
-            position: absolute; top: -0.85rem; left: 1rem; padding: 2px 12px;
-            background-color: #fef08a; border-radius: 9999px; font-weight: 700;
-            font-size: 0.85rem; color: #854d0e; z-index: 20; box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-        }
-
-        /* 收合內容動畫 */
-        .collapsible-content { 
-            overflow: hidden; 
-            transition: max-height 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .toggle-icon { transition: transform 0.3s; }
-        .accordion-header.active .toggle-icon { transform: rotate(180deg); }
-    </style>
-</head>
-<body class="min-h-screen">
-    <!-- 楓葉飄落容器 -->
-    <div id="maple-fall-container" class="maple-fall-container"></div>
-    
-    <!-- 側邊欄 (Side Menu) - 現在是頂部導航列 (已套用液態玻璃效果) -->
-    <nav id="sidebar">
-        <!-- Day tabs will be inserted here by JavaScript -->
-    </nav>
-
-    <!-- 主內容區 -->
-    <!-- 注意：這裡的 main-container padding-top 用來清除 fixed 的 sidebar -->
-    <main class="main-container relative z-20 px-4">
-        
-        <!-- 主標題區 (固定顯示，將在切換日期時替換為當日摘要) -->
-        <header class="text-center w-full max-w-4xl transition-all duration-500" id="main-header">
-            <!-- 封面標題 -->
-            <h1 id="main-title" class="text-5xl md:text-7xl font-extrabold leading-tight tracking-wider animated-title" style="letter-spacing: 0.1em; line-height: 1.3; white-space: nowrap;">
-                <!-- Content will be inserted by JS with per-character spans -->
-            </h1>
-            <!-- 封面副標題 -->
-            <p id="sub-title" class="text-xl md:text-2xl mt-6 text-gray-700 italic animated-subtitle">
-                <!-- Content will be inserted by JS -->
-            </p>
-            <!-- 每日摘要標題 (由 JS 動態插入) -->
-        </header>
-
-        <!-- 行程內容區 (點擊側邊欄後顯示, 已套用液態玻璃效果) -->
-        <div id="itinerary-content">
-            <!-- Content will be inserted here by JavaScript -->
-        </div>
-    </main>
-
-    <!-- 客製化確認視窗 MODAL -->
-    <div id="kobe-modal" class="modal-overlay" onclick="hideKobeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <h3 class="text-2xl font-bold text-red-700 mb-4 flex items-center">
-                <span class="mr-2">🗺️</span> 確認前往神戶逛街資訊整理
-            </h3>
-            <p class="text-gray-700 mb-6">點擊「確認前往」將在新視窗中開啟神戶市區的詳細逛街資訊頁面。</p>
-            <div class="flex justify-end space-x-3">
-                <button onclick="hideKobeModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition-colors duration-200">
-                    稍後再看
-                </button>
-                <button onclick="navigateToKobe()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors duration-200">
-                    確認前往
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- MODAL END -->
-
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter & Noto Sans TC -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script>
-        // =================================================================
-        // 1. 全域變數宣告
-        // =================================================================
-        let currentDay = null;
-        // 【新增】用於追蹤上一次的滾動位置
-        let lastScrollTop = 0; 
-
-        // =================================================================
-        // 2. 旅遊行程資料 (保持不變)
-        // =================================================================
-        const itineraryData = [
-            {
-                day: "Day 1",
-                date: "11/29(六)",
-                theme: "台灣高雄 → 日本大阪 → 雅",
-                events: [
-                    { time: "12:00", type: "Preparation", action: "出門 → 買麥當勞帶去機場", location: "高雄 (Kaohsiung)", details: ["爸爸開車前往機場。"] },
-                    { time: "12:30 - 15:00", type: "Procedure", action: "華航櫃檯報到、辦理出境手續", location: "高雄國際機場", details: ["領取機票、托運、出關。"] },
-                    { time: "15:25 - 19:10", type: "Flight", action: "搭乘中華航空 CI176 班機", location: "高雄國際機場 → 關西國際機場", details: ["時差考量：日本時間 (JST) +1 小時。"], isImportant: true }, 
-                    { time: "19:10 - 19:40", type: "Procedure", action: "辦理入境手續", location: "關西國際機場", details: ["啟用 eSIM。", "辦理 VJW (Visit Japan Web) 手續。"] },
-                    { time: "19:40 - 20:40", type: "Action", action: "JR綠色窗口購買票券及IC卡加值", location: "關西國際空港駅", details: ["購買「關西廣域周遊券」。", "領取已劃位車票。", "IC卡加值並購買簡單食物。"], isImportant: true, activityType: "手續辦理" },
-                    { time: "20:46 - 22:03", type: "Transport", method: "JR 特急", number: "HARUKA 56號", cost: "¥2200 (含周遊券內)", duration: "約 1 小時 17 分鐘", steps: [{ from: "関西空港駅", to: "京都駅", serviceName: "HARUKA", serviceNumber: "56號", direction: "往 京都", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "22:10 - 22:20", type: "Transport", method: "地鐵", number: "烏丸線", cost: "¥220", duration: "約 10 分鐘", steps: [{ from: "京都駅", to: "五条駅", serviceName: "烏丸線", serviceNumber: "", direction: "往 国際会館", transfer: { isTransfer: false } }] },
-                    { time: "22:20 - 22:35", type: "Action", action: "步行至住宿地點「雅」", location: "五条駅 → 雅", details: ["步行約 15 分鐘。", "需提早與民宿聯絡，告知入住時間將超過 22:00。"], activityType: "入住" },
-                    { time: "22:35", type: "Action", action: "入住飯店", location: "雅 (Miyabi)", details: ["本日住宿：雅。"] },
-                ]
-            },
-            {
-                day: "Day 2",
-                date: "11/30(日)",
-                theme: "貴船神社 → 鞍馬寺 → 宇治散策",
-                events: [
-                    { time: "06:15 - 06:30", type: "Movement", action: "步行", location: "雅 → 清水五条駅", details: [] },
-                    { time: "06:30 - 06:56", type: "Transport", method: "地鐵", number: "京阪本線 準急行", cost: "¥280", duration: "約 26 分鐘", steps: [{ from: "清水五条駅", to: "出町柳駅", serviceName: "京阪本線", serviceNumber: "準急行", direction: "往 出町柳", transfer: { isTransfer: false, note: "7:17 班次為觀光列車 KIRARA。" } }] },
-                    { time: "07:17 - 07:47", type: "Transport", method: "電鐵", number: "叡山電鐵本線", cost: "¥470", duration: "約 30 分鐘", steps: [{ from: "出町柳駅", to: "貴船口駅", serviceName: "叡山電鐵本線", serviceNumber: "", direction: "往 鞍馬", transfer: { isTransfer: false } }] },
-                    { time: "07:47 - 08:00", type: "Movement", action: "轉乘公車", location: "貴船口駅前", details: ["步行約 4 分鐘至公車站。"] },
-                    { time: "08:00 - 08:05", type: "Transport", method: "公車", number: "京都バス 33號", cost: "¥200", duration: "約 5 分鐘", steps: [{ from: "叡電貴船口駅前", to: "貴船駅", serviceName: "33號公車", serviceNumber: "", direction: "往 貴船", transfer: { isTransfer: false } }] },
-                    { time: "08:05 - 10:00", type: "Activity", action: "參觀貴船神社 (門票 ¥700)", location: "貴船神社", details: ["門票 ¥700。", "神社水籤 ¥200/人。", "川床位可能多收 ¥500。"], isImportant: true, activityType: "賞楓/參拜" },
-                    { time: "10:00 - 10:15", type: "Transport", method: "公車", number: "京都バス 33號", cost: "¥200", duration: "約 15 分鐘", steps: [{ from: "貴船", to: "叡電貴船口駅前", serviceName: "33號公車", serviceNumber: "", direction: "往 叡電貴船口駅前", transfer: { isTransfer: false } }] },
-                    { time: "10:30 - 11:00", type: "Transport", method: "電鐵", number: "叡山電鐵本線", cost: "¥220", duration: "約 30 分鐘", steps: [{ from: "貴船口駅", to: "鞍馬駅", serviceName: "叡山電鐵本線", serviceNumber: "", direction: "往 鞍馬", transfer: { isTransfer: false } }] },
-                    { time: "11:00 - 12:00", type: "Lunch", action: "午餐：Nagomiya Kotengu", location: "鞍馬寺附近", details: ["步行約 10 分鐘。"] },
-                    { time: "12:00 - 13:00", type: "Activity", action: "參觀鞍馬寺 (門票 ¥300) 與搭乘纜車", location: "鞍馬寺", details: ["門票 ¥300。", "纜車 ¥200。"], isImportant: true, activityType: "參拜" },
-                    { time: "13:00 - 14:13", type: "Transport", method: "多段轉乘", number: "電鐵/京阪/JR奈良線", cost: "¥470 + 廣域券", duration: "約 1 小時 13 分鐘", steps: [{ from: "鞍馬駅", to: "出町柳駅", serviceName: "叡山電鐵本線", serviceNumber: "", direction: "往 出町柳", transfer: { isTransfer: true, station: "出町柳駅" } }, { from: "出町柳駅", to: "東福寺駅", serviceName: "京阪本線", serviceNumber: "", direction: "往 淀屋橋", transfer: { isTransfer: true, station: "東福寺駅" } }, { from: "東福寺駅", to: "宇治駅", serviceName: "JR奈良線", serviceNumber: "", direction: "往 城陽/奈良", transfer: { isTransfer: false, note: "廣域券搭乘" } }], isImportant: true },
-                    { time: "14:13 - 14:23", type: "Movement", action: "步行至 中村藤吉(平等院店)", location: "宇治駅 → 中村藤吉", details: ["領取號碼牌。"] },
-                    { time: "14:23 - 17:30", type: "Activity", action: "參觀宇治神社、宇治公園", location: "宇治", details: ["宇治神社", "宇治公園", "17:30 於平等院等待夜間拝観。"], activityType: "參拜/散策" },
-                    { time: "17:30 - 19:20", type: "Activity", action: "平等院夜間特別拝観 (¥2200)", location: "平等院", details: ["門票 ¥700 + 夜間 ¥1500。"], isImportant: true, activityType: "特別拝観" },
-                    { time: "19:20 - 19:50", type: "Dinner", action: "晚餐：宇治周邊", location: "宇治", details: ["尋找在地美食。"] },
-                    { time: "19:50 - 20:00", type: "Transport", method: "多段轉乘", number: "JR奈良線 + 京阪本線", cost: "廣域券 + ¥280", duration: "約 30 分鐘", steps: [{ from: "宇治駅", to: "東福寺駅", serviceName: "JR奈良線", serviceNumber: "", direction: "往 京都", transfer: { isTransfer: true, station: "東福寺駅" } }, { from: "東福寺駅", to: "清水五条駅", serviceName: "京阪本線", serviceNumber: "", direction: "往 出町柳", transfer: { isTransfer: false } }] },
-                    { time: "20:00", type: "Action", action: "回到住宿地點「雅」", location: "雅", details: [] },
-                ]
-            },
-            {
-                day: "Day 3",
-                date: "12/1(一)",
-                theme: "清水寺賞楓 → 銀閣寺 → 哲學之道 → 和歌山",
-                events: [
-                    { time: "06:00 - 06:30", type: "Movement", action: "步行至清水寺", location: "雅 → 清水寺", details: ["路程約 26 分鐘。"] },
-                    { time: "06:30 - 09:20", type: "Activity", action: "參觀清水寺 (門票 ¥500)", location: "清水寺", details: ["門票 ¥500。", "清水舞台賞楓。"], isImportant: true, activityType: "賞楓/參拜" },
-                    { time: "09:20 - 09:48", type: "Transport", method: "公車", number: "EX100 City Bus", cost: "¥500", duration: "約 28 分鐘", steps: [{ from: "五条坂", to: "銀閣寺前", serviceName: "EX100 City Bus", serviceNumber: "", direction: "往 銀閣寺前", transfer: { isTransfer: false } }] },
-                    { time: "09:48 - 12:30", type: "Activity", action: "銀閣寺、哲學之道、永觀堂", location: "銀閣寺 → 南禪寺", details: ["銀閣寺門票 ¥500。", "永觀堂門票 ¥600。", "哲學之道散策。"], isImportant: true, activityType: "賞楓" },
-                    { time: "12:30 - 14:00", type: "Lunch", action: "午餐：京烏龍麵ごん太", location: "哲學之路", details: ["休息喝咖啡。"] },
-                    { time: "14:00 - 14:30", type: "Activity", action: "參觀南禪寺", location: "南禪寺", details: [] },
-                    { time: "14:30 - 14:50", type: "Transport", method: "公車", number: "5 City Bus", cost: "¥230", duration: "約 20 分鐘", steps: [{ from: "南禪寺", to: "四條河原町", serviceName: "5 City Bus", serviceNumber: "", direction: "往 四條河原町", transfer: { isTransfer: false } }] },
-                    { time: "14:50 - 17:00", type: "Shopping", action: "四條河原町逛街", location: "四條河原町", details: ["OS Drug Store", "kiddy land", "Yojiya", "RABBIT BAGELS"], activityType: "購物" },
-                    { time: "17:00 - 17:20", type: "Movement", action: "回民宿取行李", location: "雅", details: [] },
-                    { time: "17:20 - 17:47", type: "Transport", method: "地鐵", number: "烏丸線", cost: "¥220", duration: "約 27 分鐘", steps: [{ from: "五条駅", to: "京都駅", serviceName: "烏丸線", serviceNumber: "", direction: "往 竹田", transfer: { isTransfer: false } }] },
-                    { time: "17:47 - 19:23", type: "Transport", method: "JR 特急", number: "黒潮特急くろしお", cost: "廣域券", duration: "約 1 小時 36 分鐘", steps: [{ from: "京都駅", to: "和歌山駅", serviceName: "黒潮特急", serviceNumber: "くろしお", direction: "往 白濱", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "19:23 - 19:40", type: "Action", action: "步行至飯店", location: "和歌山駅 → 多美迎", details: [] },
-                    { time: "19:40 - 21:00", type: "Dinner", action: "晚餐：和歌山駅周邊", location: "和歌山駅", details: [] },
-                    { time: "21:00", type: "Action", action: "入住飯店", location: "多美迎 Premium 和歌山", details: ["本日住宿：多美迎 Premium 和歌山。"] },
-                ]
-            },
-            {
-                day: "Day 4",
-                date: "12/2(二)",
-                theme: "那智 → 那智瀑布",
-                events: [
-                    { time: "08:20", type: "Movement", action: "步行前往和歌山駅", location: "飯店 → 和歌山駅", details: ["出發前買午餐。"] },
-                    { time: "08:48 - 11:40", type: "Transport", method: "JR 特急", number: "黒潮號 (くろしお 1)", cost: "¥6140", duration: "約 2 小時 52 分鐘", steps: [{ from: "和歌山駅", to: "紀伊勝浦駅", serviceName: "黒潮號", serviceNumber: "くろしお 1", direction: "往 新宮", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "11:50 - 12:08", type: "Transport", method: "公車", number: "南海巴士31線", cost: "¥430", duration: "約 18 分鐘", steps: [{ from: "紀伊勝浦駅", to: "二の瀬橋", serviceName: "南海巴士31線", serviceNumber: "", direction: "往 那智山", transfer: { isTransfer: false } }] },
-                    { time: "12:20 - 13:00", type: "Lunch", action: "午餐：Grill Ikk", location: "二の瀬橋", details: [] },
-                    { time: "13:00 - 13:15", type: "Action", action: "大門坂茶屋換裝", location: "大門坂茶屋", details: ["平安服裝體驗。"] },
-                    { time: "13:30 - 14:00", type: "Activity", action: "參觀那智大社、青岸渡寺", location: "那智大社", details: ["部分門票 ¥300。", "夫婦杉拍照。"], isImportant: true, activityType: "參拜" },
-                    { time: "15:00 - 15:20", type: "Activity", action: "觀賞那智瀑布", location: "飛瀧神社", details: ["門票 ¥300。"] },
-                    { time: "15:20 - 15:30", type: "Transport", method: "公車", number: "南海巴士31線", cost: "¥200", duration: "約 10 分鐘", steps: [{ from: "那智瀑布", to: "熊野古道站", serviceName: "南海巴士31線", serviceNumber: "", direction: "往 紀伊勝浦駅", transfer: { isTransfer: false } }] },
-                    { time: "15:50 - 16:31", type: "Action", action: "換回便服", location: "大門坂茶屋", details: [] },
-                    { time: "16:32 - 16:53", type: "Transport", method: "公車", number: "南海巴士31線", cost: "¥540", duration: "約 21 分鐘", steps: [{ from: "熊野古道站", to: "紀伊勝浦駅", serviceName: "南海巴士31線", serviceNumber: "", direction: "往 紀伊勝浦駅", transfer: { isTransfer: false } }] },
-                    { time: "17:00 - 17:50", type: "Dinner", action: "晚餐：車站附近", location: "紀伊勝浦駅", details: ["海鮮料理。"] },
-                    { time: "18:04 - 21:02", type: "Transport", method: "JR 特急", number: "黒潮號 (くろしお36)", cost: "¥6140", duration: "約 2 小時 58 分鐘", steps: [{ from: "紀伊勝浦駅", to: "和歌山駅", serviceName: "黒潮號", serviceNumber: "くろしお36", direction: "往 新大阪", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "21:02", type: "Action", action: "回到飯店", location: "多美迎 Premium 和歌山", details: [] },
-                ]
-            },
-            {
-                day: "Day 5",
-                date: "12/3(三)",
-                theme: "小玉電車 → 和歌山城 → 黒潮市場",
-                events: [
-                    { time: "07:00 - 07:30", type: "Movement", action: "步行前往和歌山駅", location: "飯店 → 和歌山駅", details: ["於飯店先寄放行李。"] },
-                    { time: "07:30 - 08:30", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "和歌山駅", to: "伊太祈曽駅", serviceName: "貴志川線", serviceNumber: "小玉電車", direction: "往 貴志", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "08:30 - 09:15", type: "Activity", action: "參觀伊太祁曽神社", location: "伊太祁曽神社", details: ["從伊太祈曽駅步行可達。"], activityType: "參拜" },
-                    { time: "09:15 - 09:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "伊太祈曽駅", to: "貴志駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 貴志", transfer: { isTransfer: false } }] },
-                    { time: "09:45 - 10:15", type: "Activity", action: "參觀貴志駅貓站長", location: "貴志駅", details: ["貓站長上班時間約 10:00 後。"], activityType: "觀光" },
-                    { time: "10:15 - 10:45", type: "Transport", method: "電車", number: "貴志川線 小玉電車", cost: "廣域券", duration: "約 30 分鐘", steps: [{ from: "貴志駅", to: "和歌山駅", serviceName: "貴志川線", serviceNumber: "", direction: "往 和歌山駅", transfer: { isTransfer: false } }] },
-                    { time: "10:45 - 11:00", type: "Transport", method: "公車", number: "和歌山巴士30線", cost: "¥230", duration: "約 15 分鐘", steps: [{ from: "和歌山駅", to: "和歌山城前", serviceName: "30號公車", serviceNumber: "", direction: "往 雑賀崎", transfer: { isTransfer: false } }] },
-                    { time: "11:00 - 12:00", type: "Activity", action: "參觀和歌山城 (門票 ¥410)", location: "和歌山城", details: ["門票 ¥410。", "推薦茶屋冰淇淋。"], isImportant: true, activityType: "觀光" },
-                    { time: "12:00 - 12:15", type: "Movement", action: "步行至和歌山城前公車站", location: "和歌山城前", details: [] },
-                    { time: "12:15 - 13:00", type: "Transport", method: "公車", number: "和歌山巴士121線", cost: "¥520", duration: "約 45 分鐘", steps: [{ from: "和歌山城前", to: "マリーナシティ", serviceName: "121號公車", serviceNumber: "", direction: "往 海南駅前", transfer: { isTransfer: false } }] },
-                    { time: "13:00 - 14:30", type: "Lunch", action: "午餐：黒潮市場", location: "黒潮市場", details: ["黑鮪魚表演。", "Maruki 麵包。"] },
-                    { time: "14:30 - 14:50", type: "Transport", method: "公車+纜車", number: "121線+纜車", cost: "¥270+¥800", duration: "約 20 分鐘", steps: [{ from: "マリーナシティ", to: "紀三井寺", serviceName: "121號公車", serviceNumber: "", direction: "往 JR和歌山駅", transfer: { isTransfer: false } }] },
-                    { time: "15:00 - 15:30", type: "Activity", action: "參觀紀三井寺", location: "紀三井寺", details: [] },
-                    { time: "15:30 - 15:50", type: "Transport", method: "JR 線", number: "紀之國線", cost: "廣域券", duration: "約 20 分鐘", steps: [{ from: "紀三井寺駅", to: "和歌山駅", serviceName: "紀之國線", serviceNumber: "", direction: "往 和歌山", transfer: { isTransfer: false } }] },
-                    { time: "16:50 - 17:33", type: "Transport", method: "JR 特急", number: "黒潮號 (くろしお 26)", cost: "¥2630", duration: "約 43 分鐘", steps: [{ from: "和歌山駅", to: "天王寺駅", serviceName: "黒潮號", serviceNumber: "26號", direction: "往 新大阪", transfer: { isTransfer: true, station: "天王寺" } }] },
-                    { time: "17:33 - 17:50", type: "Transport", method: "JR+地鐵", number: "關西本線+御堂筋線", cost: "¥220", duration: "約 17 分鐘", steps: [{ from: "天王寺", to: "難波駅", serviceName: "關西本線", serviceNumber: "", direction: "往 JR難波", transfer: { isTransfer: false } }] },
-                    { time: "17:50", type: "Action", action: "入住飯店", location: "APA Hotel 大阪難波站前塔", details: ["本日住宿。"] },
-                ]
-            },
-            {
-                day: "Day 6",
-                date: "12/4(四)",
-                theme: "勝尾寺 → 箕面萱野 → 梅田 → 道頓堀",
-                events: [
-                    { time: "08:11 - 08:47", type: "Transport", method: "地鐵", number: "御堂筋線/北大阪急行線", cost: "¥530", duration: "約 36 分鐘", steps: [{ from: "難波站", to: "箕面萱野駅", serviceName: "御堂筋線", serviceNumber: "", direction: "往 箕面萱野", transfer: { isTransfer: false } }] },
-                    { time: "09:00 - 09:30", type: "Transport", method: "公車", number: "阪急巴士30線", cost: "¥800", duration: "約 30 分鐘", steps: [{ from: "箕面萱野", to: "勝尾寺", serviceName: "阪急巴士30線", serviceNumber: "", direction: "往 勝尾寺", transfer: { isTransfer: false } }] },
-                    { time: "09:30 - 11:50", type: "Activity", action: "參觀勝尾寺 (門票 ¥500)", location: "勝尾寺", details: ["達摩不倒翁。", "蓋章巡禮。"], isImportant: true, activityType: "參拜" },
-                    { time: "11:50 - 12:11", type: "Transport", method: "公車", number: "阪急巴士30線", cost: "¥800", duration: "約 21 分鐘", steps: [{ from: "勝尾寺", to: "箕面萱野", serviceName: "阪急巴士30線", serviceNumber: "", direction: "往 箕面萱野", transfer: { isTransfer: false } }] },
-                    { time: "12:11 - 12:43", type: "Transport", method: "地鐵", number: "北大阪急行線", cost: "¥480", duration: "約 32 分鐘", steps: [{ from: "箕面萱野", to: "梅田站", serviceName: "御堂筋線", serviceNumber: "", direction: "往 中百舌鳥", transfer: { isTransfer: false } }] },
-                    { time: "13:00 - 17:30", type: "Shopping", action: "梅田逛街", location: "梅田", details: ["阪急三番街", "Loft", "LUCUA", "友都八喜"], activityType: "購物" },
-                    { time: "17:37 - 17:53", type: "Transport", method: "地鐵", number: "御堂筋線", cost: "¥240", duration: "約 16 分鐘", steps: [{ from: "梅田站", to: "難波站", serviceName: "御堂筋線", serviceNumber: "", direction: "往 中百舌鳥", transfer: { isTransfer: false } }] },
-                    { time: "18:00 - 21:00", type: "Dinner", action: "晚餐：道頓堀", location: "道頓堀", details: ["大起水產迴轉壽司。"] },
-                    { time: "21:00", type: "Shopping", action: "Life 超市", location: "難波", details: ["買水果零食。"] },
-                ]
-            },
-            {
-                day: "Day 7",
-                date: "12/5(五)",
-                theme: "神戶布引香草園 → 摩耶山夜景",
-                events: [
-                    { time: "08:00 - 09:06", type: "Transport", method: "電車", number: "阪神難波線", cost: "¥630", duration: "約 1 小時", steps: [{ from: "大阪難波", to: "神戸三宮", serviceName: "阪神難波線", serviceNumber: "", direction: "往 神戸三宮", transfer: { isTransfer: true, station: "三宮轉地鐵" } }, { from: "三宮", to: "新神戶", serviceName: "西神山手線", serviceNumber: "", direction: "往 新神戶", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "09:40 - 11:30", type: "Activity", action: "神戶布引香草園 (套票 ¥4500)", location: "香草園", details: ["含纜車費用。"], activityType: "觀光" },
-                    { time: "11:40 - 15:50", type: "Shopping", action: "神戶市區散策", location: "三宮/元町/港區", details: ["生田神社", "元町商店街", "神戶港塔", "麵包超人博物館"], activityType: "觀光" },
-                    { time: "16:35 - 17:05", type: "Transport", method: "纜車", number: "摩耶山纜車", cost: "¥1560(來回)", duration: "約 30 分鐘", steps: [{ from: "瑪雅電纜站", to: "星之站", serviceName: "摩耶纜車", serviceNumber: "", direction: "往 山頂", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "17:05 - 18:10", type: "Activity", action: "摩耶山掬星台夜景", location: "摩耶山", details: ["日本三大夜景。"], isImportant: true, activityType: "夜景" },
-                    { time: "18:10 - 19:02", type: "Transport", method: "纜車+公車", number: "下山", cost: "¥230", duration: "約 52 分鐘", steps: [{ from: "星之站", to: "三宮", serviceName: "公車2系統", serviceNumber: "", direction: "往 三宮", transfer: { isTransfer: false } }] },
-                    { time: "20:00 - 20:42", type: "Transport", method: "電車", number: "阪神本線", cost: "¥330", duration: "約 42 分鐘", steps: [{ from: "神戸三宮", to: "大阪梅田", serviceName: "阪神本線", serviceNumber: "", direction: "往 梅田", transfer: { isTransfer: false } }] },
-                    { time: "20:42 - 21:04", type: "Transport", method: "地鐵", number: "四橋線", cost: "¥240", duration: "約 22 分鐘", steps: [{ from: "西梅田", to: "難波", serviceName: "四橋線", serviceNumber: "", direction: "往 住之江公園", transfer: { isTransfer: false } }] },
-                ]
-            },
-            {
-                day: "Day 8",
-                date: "12/6(六)",
-                theme: "難波散策 → 返程",
-                events: [
-                    { time: "08:15 - 09:30", type: "Lunch", action: "早餐：丸福咖啡店", location: "千日前本店", details: [] },
-                    { time: "09:50 - 11:00", type: "Activity", action: "參觀八板神社", location: "八板神社", details: ["獅子殿。"], activityType: "參拜" },
-                    { time: "11:00 - 13:30", type: "Shopping", action: "難波 City 逛街", location: "難波 City", details: ["MUJI", "mont-bell"], activityType: "購物" },
-                    { time: "13:30 - 14:30", type: "Lunch", action: "午餐：piccoLo咖喱", location: "NAMBA WALK店", details: ["嚐嚐他們的招牌咖哩！"] },
-                    { time: "14:30 - 15:50", type: "Shopping", action: "Life 超市購買零食", location: "難波", details: ["要注意是否有退稅櫃檯。", "可順便採買伴手禮。"], activityType: "購物" },
-                    { time: "15:50 - 16:30", type: "Action", action: "返回飯店領取行李", location: "APA Hotel 大阪難波站前塔", details: ["預留充裕時間整理行李，並將大件物品寄出。"], activityType: "領取行李" },
-                    { time: "16:30 - 17:00", type: "Movement", action: "步行至南海難波站", location: "南海難波駅", details: ["步行約 11 分鐘，準備搭乘 RAPIT 特急。"] },
-                    { time: "17:00 - 17:37", type: "Transport", method: "南海特急", number: "RAPIT ẞ 55", cost: "¥1490", duration: "約 37 分鐘", steps: [{ from: "南海難波", to: "關西機場", serviceName: "RAPIT", serviceNumber: "55號", direction: "往 機場", transfer: { isTransfer: false } }], isImportant: true },
-                    { time: "20:10 - 22:45", type: "Flight", action: "搭乘華航 C1177航班", location: "大阪 → 高雄", details: ["回家囉。"], isImportant: true },
-                ]
-            }
-        ];
-
-        // =================================================================
-        // 3. UI 產生函式
-        // =================================================================
-
-        // 【新增】日本星期對應表
-        const dayMap = {
-            '日': { name: '日曜日', color: 'text-red-500' },
-            '一': { name: '月曜日', color: 'text-yellow-600' },
-            '二': { name: '火曜日', color: 'text-red-700' },
-            '三': { name: '水曜日', color: 'text-blue-500' },
-            '四': { name: '木曜日', color: 'text-green-600' },
-            '五': { name: '金曜日', color: 'text-yellow-700' },
-            '六': { name: '土曜日', color: 'text-gray-700' },
-        };
-
-        function cleanLocationName(locationString) {
-            if (typeof locationString !== 'string') return "";
-            return locationString.split('(')[0].trim();
-        }
-
-        function getEventIcon(type, method = '') {
-            const iconClass = "w-6 h-6";
-            // 飛機圖示
-            if (type === 'Flight') return `<svg class="${iconClass} text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>`;
-            // 交通圖示
-            if (type === 'Transport') {
-                // 公車圖示
-                if (method && (method.includes('公車') || method.includes('巴士'))) return `<svg class="${iconClass} text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>`;
-                // 火車/電車圖示
-                return `<svg class="${iconClass} text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>`;
-            }
-            // 一般流程/行動圖示
-            if (['Procedure','Preparation','Action','Movement'].includes(type)) return `<svg class="${iconClass} text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>`;
-            // 餐飲圖示
-            if (['Lunch','Dinner'].includes(type)) return `<svg class="${iconClass} text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 2h2M7 2h2M15 2h2M6 22h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v13a2 2 0 002 2z"></path></svg>`;
-            // 活動/觀光圖示
-            if (type === 'Activity') return `<svg class="${iconClass} text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path></svg>`;
-            // 購物圖示
-            if (type === 'Shopping') return `<svg class="${iconClass} text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>`;
-            return `<svg class="${iconClass} text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle></svg>`;
-        }
-
-        /**
-         * 根據目前顯示的日期的最後一個項目位置，重新計算時間軸線的高度。
-         * @param {string} day - 當前日期 (e.g., "Day 1")
-         */
-        function updateTimelineHeight(day) {
-            const dayData = itineraryData.find(d => d.day === day);
-            if (!dayData) return;
-
-            const lastItem = document.getElementById(`timeline-item-${dayData.events.length - 1}`);
-            const line = document.getElementById(`timeline-line-${day}`);
-
-            if (lastItem && line) {
-                // offsetTop 已經是相對於 timeline-container 的位置
-                // + 24 是讓線條延伸到最後一個 icon 的中心點 (icon 高度 48px / 2 = 24px)
-                const height = lastItem.offsetTop + 24; 
-                line.style.height = `${height}px`;
-            }
-        }
-
-        function toggleDetails(contentId) {
-            const content = document.getElementById(contentId);
-            if (!content) return;
-            const header = content.previousElementSibling; 
-            
-            // 從 contentId 中提取 Day 資訊
-            const day = contentId.split('-')[0]; 
-
-            if (content.style.maxHeight && content.style.maxHeight !== '0px') {
-                // 正在收合
-                
-                // 【修正 4 - 收合】在設定 max-height 之前，就先更新線條高度，讓線條跟內容一起平滑收縮
-                content.style.maxHeight = '0px';
-                if(header) header.classList.remove('active');
-                
-                // 延遲更新線條高度，確保視覺效果
-                setTimeout(() => updateTimelineHeight(day), 500); 
-
-            } else {
-                // 正在展開
-                content.style.maxHeight = content.scrollHeight + "px";
-                if(header) header.classList.add('active');
-
-                // 【修正 4 - 展開】立即更新線條高度，讓它跟著內容一起伸長
-                updateTimelineHeight(day); 
-            }
-        }
-
-        function renderTransportStep(step, index, totalSteps, method, cost) {
-            const isTransfer = step.transfer && step.transfer.isTransfer;
-            const labelText = step.serviceName + (step.serviceNumber ? ` ${step.serviceNumber}` : '');
-            let transferInfo = '';
-            
-            if (isTransfer) {
-                transferInfo = `<p class="text-sm text-yellow-600 mt-2 font-bold flex items-center">
-                    <span class="mr-1">🔄</span> 轉乘車站: ${cleanLocationName(step.transfer.station)}
-                </p>`;
-            } else if (step.transfer && step.transfer.note) {
-                transferInfo = `<p class="text-xs text-gray-500 mt-2 italic">ⓘ ${step.transfer.note}</p>`;
-            }
-            
-            // 決定是交通線路 (Transport) 還是飛機線路 (Flight)
-            const isFlight = step.isFlight || false;
-
-            // 路線中間的動態符號
-            // 根據使用者要求，移除動態符號 (► / »)，只保留空字串
-            let dynamicLineContent = '';
-
-            return `
-                <div class="transport-card p-4 rounded-lg shadow-md mb-6 hover:ring-2 hover:ring-red-300">
-                    <div class="flex items-center justify-between mb-2">
-                        <h4 class="text-lg font-bold text-red-700">${method}</h4>
-                        <span class="text-sm font-semibold bg-red-100 text-red-800 px-3 py-1 rounded-full">${cost}</span>
-                    </div>
-                    <div class="flex items-center mt-3">
-                        <div class="flex flex-col items-center min-w-[80px] text-center">
-                            <div class="w-3 h-3 ${isFlight ? 'bg-purple-700' : 'bg-red-700'} rounded-full"></div>
-                            <span class="text-sm mt-1 font-medium">${cleanLocationName(step.from)}</span>
-                        </div>
-                        <div class="${isFlight ? 'flight-line' : 'transport-line'} mx-2 flex items-center justify-center flex-grow">
-                            ${dynamicLineContent}
-                            <div class="transport-label">${labelText}</div>
-                        </div>
-                        <div class="flex flex-col items-center min-w-[80px] text-center">
-                            <div class="w-3 h-3 ${isFlight ? 'bg-purple-700' : 'bg-red-700'} rounded-full"></div>
-                            <span class="text-sm mt-1 font-bold ${isFlight ? 'text-purple-700' : 'text-red-700'}">${cleanLocationName(step.to)}</span>
-                        </div>
-                    </div>
-                    <div class="mt-4 border-t pt-3 border-gray-200">
-                        <p class="text-sm text-gray-700"><span class="font-bold ${isFlight ? 'text-purple-600' : 'text-red-600'}">方向:</span> ${cleanLocationName(step.direction)}</p>
-                        ${transferInfo}
-                    </div>
-                </div>
-            `;
-        }
-
-        /**
-         * 渲染每日行程的緊湊型標題，並將其插入到 main-header 區域。
-         * @param {object} dayData - 當日行程數據
-         */
-        function renderDayHeader(dayData) {
-            const header = document.getElementById('main-header');
-            const mainTitle = document.getElementById('main-title');
-            const subTitle = document.getElementById('sub-title');
-
-            // 1. 隱藏/移除封面標題元素，讓出空間
-            mainTitle.classList.add('hidden-content');
-            subTitle.classList.add('hidden-content');
-            header.style.animation = 'none';
-            
-            // 2. 準備新的緊湊型標題內容
-            const chineseDayMatch = dayData.date.match(/\((.)\)/);
-            const chineseDay = chineseDayMatch ? chineseDayMatch[1] : '';
-            const jpDay = dayMap[chineseDay] || { name: '', color: 'text-gray-500' };
-
-            const dateHtml = `
-                <span class="text-xl font-bold">${dayData.date}</span>
-                <span class="text-base font-normal ml-2 ${jpDay.color}">( ${jpDay.name} )</span>
-            `;
-
-            const newHeaderHtml = `
-                <div id="day-header-compact" class="day-header-compact flex flex-col items-center p-4 border-b-2 border-red-300 w-full bg-white/50 backdrop-blur-sm rounded-xl shadow-lg">
-                    <div class="flex items-center text-red-800 mb-2">
-                        <span class="text-4xl font-extrabold mr-4">${dayData.day}</span>
-                        <span class="text-2xl">${dateHtml}</span>
-                    </div>
-                    <h3 class="text-lg font-semibold text-gray-700 italic flex items-center">
-                        <span class="mr-2 text-xl">🎯</span>${dayData.theme}
-                    </h3>
-                </div>
-            `;
-            
-            // 3. 檢查是否已存在，如果存在則替換，否則插入
-            let existingCompact = document.getElementById('day-header-compact');
-            if (existingCompact) {
-                // 替換內容並重置動畫
-                existingCompact.outerHTML = newHeaderHtml;
-            } else {
-                // 插入新元素到 header 的頂部
-                header.insertAdjacentHTML('afterbegin', newHeaderHtml);
-            }
-
-            // 4. 確保整個 header 容器顯示
-            header.style.opacity = '1';
-            header.style.transform = 'translateY(0)';
-            header.style.pointerEvents = 'auto';
-        }
-
-        function renderItinerary(dayData) {
-            const contentDiv = document.getElementById('itinerary-content');
-            
-            // 注意：這裡移除了原本的 H2/H3 標題，它們現在由 renderDayHeader 處理
-            let html = `
-                <div class="timeline-container relative">
-                    <div id="timeline-line-${dayData.day}" class="timeline-line"></div>
-            `;
-
-            dayData.events.forEach((event, index) => {
-                const isImportant = event.isImportant ? ' flashing-border ring-2 ring-red-200' : '';
-                const contentId = `${dayData.day}-${index}-content`;
-                const iconSvg = getEventIcon(event.type, event.method);
-
-                let cardContentHtml = '';
-                let bgColorClass = 'bg-white/75';
-                
-                // 根據類型設定卡片顏色
-                if (event.type === 'Transport') bgColorClass = 'bg-blue-100/50';
-                else if (['Lunch', 'Dinner'].includes(event.type)) bgColorClass = 'bg-orange-100/50';
-                else if (event.type === 'Activity') bgColorClass = 'bg-red-100/50';
-                else if (event.type === 'Flight') bgColorClass = 'bg-purple-100/50'; // 飛機用紫色
-                else if (event.type === 'Action' && event.action.includes('入住飯店')) bgColorClass = 'bg-green-100/50'; 
-
-                if (event.type === 'Transport' && event.steps && event.steps.length > 0) {
-                    const headerHtml = `
-                        <div class="flex-grow">
-                            <h4 class="text-xl font-bold text-gray-800 flex items-center">
-                                ${event.number} <span class="ml-2 text-sm font-normal text-gray-600 bg-white px-2 py-0.5 rounded border border-gray-200">${event.method}</span>
-                            </h4>
-                            <p class="text-sm text-gray-600 mt-1 font-medium flex items-center">
-                                <span class="mr-1">⏱️</span> ${event.duration}
-                            </p>
-                        </div>
-                        <svg class="w-6 h-6 text-gray-400 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    `;
-                    const contentHtml = `<div class="pt-4 space-y-4">${event.steps.map((step, i) => renderTransportStep(step, index, event.steps.length, event.method, event.cost)).join('')}</div>`;
-                    cardContentHtml = `
-                        <div class="accordion-header cursor-pointer flex items-center" onclick="toggleDetails('${contentId}')">${headerHtml}</div>
-                        <div id="${contentId}" class="collapsible-content" style="max-height: 0px;">${contentHtml}</div>
-                    `;
-                } else if (event.type === 'Flight') {
-                    // 針對 Flight 事件，將 isFlight 標記傳入 renderTransportStep 函式
-                    const flightStep = { 
-                        ...event.steps?.[0] || { 
-                            from: cleanLocationName(event.location.split('→')[0]), 
-                            to: cleanLocationName(event.location.split('→')[1]), 
-                            serviceName: event.action, 
-                            direction: event.details[0] 
-                        }, 
-                        isFlight: true,
-                        // 修正：手動添加 Flight 步驟的服務名稱
-                        serviceName: event.action.split('搭乘')[1]?.trim() || '國際航班'
-                    };
-                    const flightCardHtml = renderTransportStep(flightStep, index, 1, '航班', '無費用'); 
-                    
-                    const headerHtml = `
-                        <div class="flex-grow">
-                            <h4 class="text-xl font-bold text-purple-700 flex items-center">
-                                ${event.action}
-                            </h4>
-                            <p class="text-sm text-gray-600 mt-1 font-medium flex items-center">
-                                <span class="mr-1">🗺️</span> ${cleanLocationName(event.location)}
-                            </p>
-                        </div>
-                        <svg class="w-6 h-6 text-gray-400 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    `;
-                    const detailsList = event.details ? event.details.map(d => `<li class="flex items-start text-gray-700 mb-1"><span class="text-red-400 mr-2">•</span>${d}</li>`).join('') : '';
-
-                    cardContentHtml = `
-                        <div class="accordion-header cursor-pointer flex items-center" onclick="toggleDetails('${contentId}')">${headerHtml}</div>
-                        <div id="${contentId}" class="collapsible-content" style="max-height: 0px;">
-                            <div class="pt-4 space-y-4">
-                                ${flightCardHtml}
-                                ${detailsList ? `<ul class="mt-3 pl-2 border-t border-gray-200 pt-2">${detailsList}</ul>` : ''}
-                            </div>
-                        </div>
-                    `;
-
-                } else {
-                    const detailsList = event.details ? event.details.map(d => `<li class="flex items-start text-gray-700 mb-1"><span class="text-red-400 mr-2">•</span>${d}</li>`).join('') : '';
-                    const locationClean = cleanLocationName(event.location);
-                    const headerHtml = `
-                        <div class="flex-grow">
-                            <h4 class="text-xl font-bold text-gray-900">${event.action}</h4>
-                            ${locationClean ? `<p class="text-sm text-gray-600 mt-1 font-medium flex items-center"><span class="mr-1">📍</span>${locationClean}</p>` : ''}
-                        </div>
-                        ${detailsList ? `<svg class="w-6 h-6 text-gray-400 toggle-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>` : ''}
-                    `;
-                    
-                    cardContentHtml = `
-                        <div class="accordion-header ${detailsList ? 'cursor-pointer' : ''} flex items-center" ${detailsList ? `onclick="toggleDetails('${contentId}')"` : ''}>${headerHtml}</div>
-                        ${detailsList ? `<div id="${contentId}" class="collapsible-content" style="max-height: 0px;"><ul class="mt-3 pl-2 border-t border-gray-200 pt-2">${detailsList}</ul></div>` : ''}
-                    `;
-
-                    // 【新增邏輯】檢查是否為 Day 7 的 神戶市區散策，並插入按鈕
-                    if (dayData.day === 'Day 7' && event.action === '神戶市區散策') {
-                        const kobeButtonHtml = `
-                            <button onclick="showKobeModal()" class="mt-4 w-full bg-yellow-500 hover:bg-yellow-600 text-gray-800 font-bold py-2 px-4 rounded-lg shadow-md transition-all duration-300 flex items-center justify-center">
-                                <span class="mr-2">🛍️</span> 前往神戶逛街地圖
-                            </button>
-                        `;
-                        cardContentHtml += kobeButtonHtml;
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans TC', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        esun: {
+                            50: '#f0fdf4',
+                            500: '#13b5b1', // 玉山銀行品牌綠/藍
+                            600: '#0f9693',
+                            700: '#0b7875',
+                        },
+                        mayblue: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#021320', // 五月天藍深色背景
+                        }
                     }
                 }
-
-                html += `
-                    <div class="timeline-item group" id="timeline-item-${index}">
-                        <div class="timeline-icon group-hover:scale-110 transition-transform bg-white">
-                            ${iconSvg}
-                        </div>
-                        <!-- 卡片應用半透明底色和玻璃模糊效果 -->
-                        <div class="timeline-content-card ${bgColorClass} p-5 rounded-xl shadow-md border border-gray-100 hover:shadow-lg ${isImportant}">
-                             <div class="timeline-time-box shadow-sm border border-yellow-200">
-                                 ${event.time}
-                            </div>
-                            ${cardContentHtml}
-                        </div>
-                    </div>
-                `;
-            });
-
-            html += `</div>`;
-            contentDiv.innerHTML = html;
-            contentDiv.classList.add('show');
-            
-            // 【修正 3 - 載入】在內容渲染完成後，首次計算並設置時間軸線的高度
-            // 延遲執行，確保所有 DOM 元素都已正確測量高度
-            setTimeout(() => updateTimelineHeight(dayData.day), 50);
+            }
         }
-
-        // 【重構】通用字符動畫函式 (保持不變)
-        function applyCharacterAnimation(elementId, rawText, animationName, delayIncrement, duration = '4s', iteration = 'infinite') {
-            const element = document.getElementById(elementId);
-            if (!element) return;
-
-            let delay = 0;
-            let animatedHtml = '';
-            
-            // 處理換行符號 <br> 為 \n，然後分割字符 (Array.from 處理多字節字符)
-            const textWithBreaks = rawText.replace(/<br>/g, '\n'); 
-            const characters = Array.from(textWithBreaks); 
-
-            element.innerHTML = ''; 
-
-            characters.forEach((char) => {
-                if (char === '\n') {
-                    animatedHtml += '<br>';
-                    // 重設 delay，讓下一行從頭開始動畫
-                    delay = 0; 
-                } else if (char === ' ') {
-                    animatedHtml += '&nbsp;'; // 使用不換行空格確保間距
-                } else {
-                    // 移除內聯的 opacity:0，完全依靠 keyframes 和 animation-fill-mode: both 來控制起始狀態
-                    animatedHtml += `<span style="display:inline-block; animation: ${animationName} ${duration} ease-in-out ${iteration} both; animation-delay: ${delay}s;">${char}</span>`;
-                    delay += delayIncrement;
-                }
-            });
-
-            element.innerHTML = animatedHtml;
+    </script>
+    <style>
+        /* 滾動條樣式 */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
+        ::-webkit-scrollbar-track {
+            background: #021320;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #13b5b1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #38bdf8;
+        }
+        /* 螢光海動畫 */
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.65; transform: scale(1.05); }
+        }
+        .glow-bg {
+            animation: pulse-glow 5s ease-in-out infinite;
+        }
+        /* 斜條紋背景（用於視線瑕疵區警示） */
+        .stripe-bg {
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(239, 68, 68, 0.15),
+                rgba(239, 68, 68, 0.15) 10px,
+                rgba(0, 0, 0, 0.2) 10px,
+                rgba(0, 0, 0, 0.2) 20px
+            );
+        }
+    </style>
+</head>
+<body class="bg-mayblue-950 text-slate-100 font-sans min-h-screen flex flex-col antialiased selection:bg-esun-500 selection:text-white">
 
-        function renderSidebar() {
-            const sidebarNav = document.getElementById('sidebar');
-            
-            // 【修正 1】新增回到首頁按鈕 (Day 0)
-            let itemsHtml = `
-                <div class="sidebar-item active" onclick="switchDay(0)" id="sidebar-item-home">
-                    <div class="sidebar-icon-container text-red-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+    <!-- 頂部導航欄 (Header) -->
+    <header class="sticky top-0 z-50 bg-mayblue-950/95 backdrop-blur-md border-b border-mayblue-900/60 shadow-lg">
+        <!-- 冠名贊助橫條 -->
+        <div class="bg-gradient-to-r from-esun-600 via-esun-500 to-mayblue-700 py-1.5 px-4 text-center text-xs font-bold text-white tracking-widest flex items-center justify-center space-x-2">
+            <span class="bg-white text-esun-600 px-1.5 py-0.2 rounded text-[10px] font-black">E.SUN BANK</span>
+            <span>玉山銀行 冠名贊助：五月天回到那一天台北站</span>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 sm:h-20">
+                <!-- LOGO -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-esun-500 to-mayblue-500 flex items-center justify-center shadow-lg shadow-esun-500/20">
+                        <i class="fa-solid fa-ticket text-white text-xl rotate-[-15deg]"></i>
                     </div>
-                    <div class="sidebar-text">
-                        <div class="sidebar-text-day" style="font-size:1.1rem; font-weight:800; color: #b91c1c;">回到首頁</div>
-                        <div class="sidebar-text-date text-gray-500">總覽 / 封面</div>
+                    <div>
+                        <div class="flex items-center space-x-1">
+                            <span class="text-xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-mayblue-100 to-esun-500">tixCraft 拓元售票</span>
+                        </div>
+                        <span class="block text-[9px] text-mayblue-400 tracking-widest uppercase font-bold">Official Ticket Portal</span>
                     </div>
                 </div>
-            `;
 
-            const dayItemsHtml = itineraryData.map((data, index) => {
-                const dayNum = index + 1;
-                return `
-                    <div class="sidebar-item" onclick="switchDay(${dayNum})" id="sidebar-item-${dayNum}">
-                        <div class="sidebar-icon-container text-gray-600">
-                            <span class="font-bold text-lg">${dayNum}</span>
+                <!-- 頂部導航選單 -->
+                <nav class="hidden md:flex space-x-8 text-sm font-semibold">
+                    <button onclick="switchTab('home')" class="nav-link text-white hover:text-esun-500 transition-colors py-2 px-1 relative" id="nav-home">
+                        首頁資訊
+                    </button>
+                    <button onclick="switchTab('rules')" class="nav-link text-slate-300 hover:text-esun-500 transition-colors py-2 px-1 relative" id="nav-rules">
+                        購票須知與常見問題
+                    </button>
+                    <button onclick="switchTab('orders')" class="nav-link text-slate-300 hover:text-esun-500 transition-colors py-2 px-1 relative" id="nav-orders">
+                        我的票券 (電子票夾)
+                        <span id="ticket-badge" class="hidden absolute -top-1 -right-3 bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold scale-90">0</span>
+                    </button>
+                </nav>
+
+                <!-- 右側用戶狀態 -->
+                <div class="flex items-center space-x-4">
+                    <div class="hidden sm:flex items-center space-x-2 text-xs text-esun-500 border border-esun-500/30 bg-esun-500/5 px-3 py-1.5 rounded-full font-bold">
+                        <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 inline-block animate-ping"></span>
+                        <span>拓元高流量模式開啟 (台北機房)</span>
+                    </div>
+                    <button onclick="switchTab('orders')" class="flex items-center space-x-2 bg-esun-500/10 hover:bg-esun-500/20 text-esun-500 text-sm font-bold py-2 px-4 rounded-xl transition duration-200 border border-esun-500/30">
+                        <i class="fa-solid fa-user text-xs"></i>
+                        <span>會員專區</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主區塊 -->
+    <main class="flex-grow">
+        <!-- ==================== SCREEN 1: 首頁活動資訊與售票資訊 ==================== -->
+        <section id="screen-home" class="tab-content block pb-16">
+            <!-- 英雄橫幅 (Hero Banner) -->
+            <div class="relative bg-black overflow-hidden h-[340px] md:h-[500px] flex items-center justify-center">
+                <!-- 舞台光特效背景 -->
+                <div class="absolute inset-0 bg-cover bg-center opacity-30 bg-no-repeat" style="background-image: url('https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&q=80&w=1920');"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-mayblue-950 via-mayblue-950/40 to-black/90"></div>
+                
+                <!-- 動態光束 -->
+                <div class="absolute inset-0 pointer-events-none overflow-hidden opacity-40 glow-bg">
+                    <div class="absolute w-[250px] h-[600px] bg-esun-500/40 blur-[100px] rounded-full top-[-100px] left-[15%] rotate-[20deg]"></div>
+                    <div class="absolute w-[350px] h-[600px] bg-mayblue-400/30 blur-[120px] rounded-full top-[-100px] right-[15%] rotate-[-20deg]"></div>
+                </div>
+
+                <!-- 橫幅內容 -->
+                <div class="relative z-10 max-w-7xl mx-auto px-4 text-center">
+                    <span class="inline-block bg-esun-500/25 text-esun-500 text-xs md:text-sm font-extrabold tracking-widest uppercase px-4 py-2 rounded-full mb-4 border border-esun-500/40 backdrop-blur-sm shadow-lg shadow-esun-500/10">
+                        <i class="fa-solid fa-gem mr-1"></i> 玉山銀行 冠名贊助
+                    </span>
+                    <p class="text-xs md:text-sm font-bold tracking-widest text-mayblue-300 uppercase mb-2">
+                        MAYDAY #5525+2 LIVE TOUR
+                    </p>
+                    <h1 class="text-3xl md:text-6xl font-black tracking-wider text-white mb-2 filter drop-shadow-md">
+                        五月天 2026 [ <span class="text-transparent bg-clip-text bg-gradient-to-r from-esun-500 via-mayblue-200 to-white">#5525+2 回到那一天</span> ]
+                    </h1>
+                    <p class="text-lg md:text-3xl font-extrabold tracking-widest text-mayblue-100 mb-6 font-mono">
+                        25週年巡迴演唱會 <span class="text-esun-500">台北站・重回大巨蛋版</span>
+                    </p>
+                    <div class="flex flex-wrap justify-center gap-3 text-xs md:text-sm text-slate-300">
+                        <span class="bg-black/60 px-4 py-2.5 rounded-xl border border-mayblue-800/80 backdrop-blur-md">
+                            <i class="fa-solid fa-location-dot text-rose-500 mr-1.5"></i> 臺北大巨蛋 (Taipei Dome)
+                        </span>
+                        <span class="bg-black/60 px-4 py-2.5 rounded-xl border border-mayblue-800/80 backdrop-blur-md">
+                            <i class="fa-regular fa-calendar-days text-esun-500 mr-1.5"></i> 2026.07.03 ~ 2026.07.12 (共7場次)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 開賣動態指示 & 售票詳情 -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-[-40px] relative z-20">
+                <div class="bg-gradient-to-r from-mayblue-900 to-mayblue-950 rounded-2xl p-6 md:p-8 border border-mayblue-800 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-1.5">
+                            <span class="flex h-3 w-3 relative">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-esun-500 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-esun-500"></span>
+                            </span>
+                            <h3 class="text-lg font-bold text-white tracking-wide">官方指定拓元售票系統：熱烈開賣中</h3>
                         </div>
-                        <div class="sidebar-text">
-                            <div class="sidebar-text-day">DAY ${dayNum}</div>
-                            <div class="sidebar-text-date">${data.date}</div>
+                        <p class="text-xs text-mayblue-300">本場次全面實行「實名制登錄與五月天經典答題驗證」，預防搶票機器人。</p>
+                    </div>
+                    <!-- 購票狀態 -->
+                    <div class="flex items-center space-x-3 text-center bg-black/40 p-3 px-5 rounded-2xl border border-mayblue-800">
+                        <div>
+                            <span class="block text-xs text-slate-400">售票啟動日</span>
+                            <span class="text-base md:text-lg font-black text-esun-500 font-mono">05 / 23 (六)</span>
+                        </div>
+                        <div class="h-8 w-[1px] bg-mayblue-800 mx-2"></div>
+                        <div>
+                            <span class="block text-xs text-slate-400">目前伺服器狀況</span>
+                            <span class="text-xs bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded border border-emerald-500/20 inline-block mt-0.5">流暢 (綠燈)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 售票主核心：場次選擇 -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    
+                    <!-- 左側/中側：場次列表 -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <div>
+                            <h2 class="text-2xl font-black tracking-wide text-white border-l-4 border-esun-500 pl-3 mb-6 flex items-center justify-between">
+                                <span>選擇演出場次 (共7場)</span>
+                                <span class="text-xs font-normal text-slate-400">請選取特定場次進入選區購票</span>
+                            </h2>
+                            
+                            <!-- 場次列表 -->
+                            <div class="space-y-4">
+                                <!-- 場次 1 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">03</span>
+                                            <span class="block text-[10px] text-slate-400">星期五 19:00</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-mayblue-800 text-mayblue-300 text-[10px] font-bold px-2 py-0.5 rounded">19:00 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">台北大巨蛋首場</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/20 font-medium">釋票中</span>
+                                        <button onclick="startBooking('2026-07-03', '19:00')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 場次 2 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">04</span>
+                                            <span class="block text-[10px] text-slate-400">星期六 18:30</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">18:30 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">週末超熱血場</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded border border-amber-500/20 font-medium">剩餘極少</span>
+                                        <button onclick="startBooking('2026-07-04', '18:30')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 場次 3 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">05</span>
+                                            <span class="block text-[10px] text-slate-400">星期日 18:30</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">18:30 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">週日歡聚場</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/20 font-medium">釋票中</span>
+                                        <button onclick="startBooking('2026-07-05', '18:30')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 場次 4 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">08</span>
+                                            <span class="block text-[10px] text-slate-400">星期三 19:00</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-mayblue-800 text-mayblue-300 text-[10px] font-bold px-2 py-0.5 rounded">19:00 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">週三狂歡夜</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/20 font-medium">釋票中</span>
+                                        <button onclick="startBooking('2026-07-08', '19:00')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 場次 5 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">10</span>
+                                            <span class="block text-[10px] text-slate-400">星期五 19:00</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-mayblue-800 text-mayblue-300 text-[10px] font-bold px-2 py-0.5 rounded">19:00 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">週五星空搖滾</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/20 font-medium">釋票中</span>
+                                        <button onclick="startBooking('2026-07-10', '19:00')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 場次 6 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">11</span>
+                                            <span class="block text-[10px] text-slate-400">星期六 18:30</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">18:30 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">黃金週末盛宴</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-amber-500/10 text-amber-400 px-2.5 py-1 rounded border border-amber-500/20 font-medium">剩餘極少</span>
+                                        <button onclick="startBooking('2026-07-11', '18:30')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 場次 7 -->
+                                <div class="bg-mayblue-900/30 hover:bg-mayblue-900/50 border border-mayblue-800 rounded-xl p-5 transition duration-300 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:border-esun-500/60 group">
+                                    <div class="flex items-center space-x-5">
+                                        <div class="bg-mayblue-950 rounded-xl p-3 border border-mayblue-800 text-center min-w-[90px]">
+                                            <span class="block text-xs font-bold text-esun-500">2026 / 07</span>
+                                            <span class="block text-2xl font-black text-white">12</span>
+                                            <span class="block text-[10px] text-slate-400">星期日 18:30</span>
+                                        </div>
+                                        <div>
+                                            <div class="flex flex-wrap items-center gap-2">
+                                                <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">實名制</span>
+                                                <span class="bg-amber-500/10 text-amber-400 text-[10px] font-bold px-2 py-0.5 rounded">18:30 開演</span>
+                                                <span class="text-slate-200 font-bold text-lg">台北最終巡迴場</span>
+                                            </div>
+                                            <p class="text-sm text-slate-400 mt-1">
+                                                <i class="fa-solid fa-location-dot text-xs text-esun-500"></i> 臺北大巨蛋 Taipei Dome
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="w-full md:w-auto flex items-center justify-between md:justify-end gap-4 border-t border-mayblue-900/60 md:border-t-0 pt-3 md:pt-0">
+                                        <span class="text-xs bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded border border-emerald-500/20 font-medium">釋票中</span>
+                                        <button onclick="startBooking('2026-07-12', '18:30')" class="w-28 bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-bold py-2.5 rounded-lg text-sm text-center shadow-md shadow-esun-500/20 hover:scale-[1.03] transition-all">
+                                            立即購票
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 票價分佈與級別（含親子套票說明） -->
+                        <div class="bg-mayblue-900/20 border border-mayblue-800/60 rounded-xl p-6 space-y-4">
+                            <h3 class="text-lg font-bold text-white flex items-center">
+                                <i class="fa-solid fa-circle-info text-esun-500 mr-2"></i> 票價分級與特別套票說明
+                            </h3>
+                            
+                            <!-- 標準票價 -->
+                            <div class="space-y-2">
+                                <span class="text-sm font-bold text-slate-300 block">對號座席一般票價</span>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <div class="bg-mayblue-950 p-3 rounded-lg border-l-4 border-emerald-500">
+                                        <span class="text-slate-400 text-[10px] block">瘋狂世界 搖滾A區</span>
+                                        <span class="text-white font-bold font-mono">NT$ 5,525</span>
+                                    </div>
+                                    <div class="bg-mayblue-950 p-3 rounded-lg border-l-4 border-teal-500">
+                                        <span class="text-slate-400 text-[10px] block">瘋狂世界 搖滾B區</span>
+                                        <span class="text-white font-bold font-mono">NT$ 4,525</span>
+                                    </div>
+                                    <div class="bg-mayblue-950 p-3 rounded-lg border-l-4 border-cyan-500">
+                                        <span class="text-slate-400 text-[10px] block">看台精選區</span>
+                                        <span class="text-white font-bold font-mono">NT$ 4,225 / 3,225</span>
+                                    </div>
+                                    <div class="bg-mayblue-950 p-3 rounded-lg border-l-4 border-blue-500">
+                                        <span class="text-slate-400 text-[10px] block">看台輕巧 / 山頂區</span>
+                                        <span class="text-white font-bold font-mono">NT$ 2,225 / 1,525</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 親子套票 -->
+                            <div class="bg-esun-500/10 border border-esun-500/20 p-4 rounded-xl space-y-2">
+                                <div class="flex items-center space-x-2">
+                                    <span class="bg-esun-500 text-white text-[10px] font-black px-2 py-0.5 rounded">優惠</span>
+                                    <h4 class="font-bold text-esun-500 text-sm">親子套票方案 (包含年滿60歲以上長者)</h4>
+                                </div>
+                                <p class="text-xs text-slate-300 leading-relaxed">
+                                    親子套票納入「年滿 60歲以上長者」，現場經查驗如有不符規定者，應補足與原票價之差額方可取票入場。若有剩餘座位，主辦單位有權將座位以原票價釋出販售。
+                                </p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+                                    <div class="bg-black/30 p-2.5 rounded-lg">
+                                        <span class="text-slate-400 text-[10px] block">搖滾區套票</span>
+                                        <span class="text-white font-bold font-mono text-xs">NT$ 4,225 <span class="text-slate-500 line-through text-[10px]">原 $4525</span></span>
+                                    </div>
+                                    <div class="bg-black/30 p-2.5 rounded-lg">
+                                        <span class="text-slate-400 text-[10px] block">看台 A 套票</span>
+                                        <span class="text-white font-bold font-mono text-xs">NT$ 3,225 <span class="text-slate-500 line-through text-[10px]">原 $4225</span></span>
+                                    </div>
+                                    <div class="bg-black/30 p-2.5 rounded-lg">
+                                        <span class="text-slate-400 text-[10px] block">看台 B 套票</span>
+                                        <span class="text-white font-bold font-mono text-xs">NT$ 2,225 <span class="text-slate-500 line-through text-[10px]">原 $3225</span></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 身障票價 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="bg-mayblue-950/80 p-3 rounded-lg border border-mayblue-800">
+                                    <span class="text-slate-400 text-[10px] block">看台身障席 A</span>
+                                    <span class="text-white font-bold font-mono">NT$ 2,112</span>
+                                </div>
+                                <div class="bg-mayblue-950/80 p-3 rounded-lg border border-mayblue-800">
+                                    <span class="text-slate-400 text-[10px] block">看台身障席 B</span>
+                                    <span class="text-white font-bold font-mono">NT$ 1,612</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右側：視線瑕疵區警示與主辦聲明 -->
+                    <div class="space-y-6">
+                        <!-- 視線說明卡片 -->
+                        <div class="bg-gradient-to-br from-rose-950/30 to-red-950/50 border border-rose-900/60 rounded-xl p-6 space-y-4">
+                            <h3 class="text-lg font-black text-rose-400 flex items-center border-b border-rose-900/60 pb-2">
+                                <i class="fa-solid fa-triangle-exclamation text-rose-500 mr-2 animate-pulse"></i> 特殊區域視線說明
+                            </h3>
+                            <p class="text-xs text-slate-300 leading-relaxed">
+                                為維護演唱會現場品質及秩序以及您自身權益，購票前敬請詳閱下方視線說明，並請自行斟酌是否購買。
+                            </p>
+                            <div class="bg-black/40 p-3 rounded-lg border border-rose-900/40 space-y-2">
+                                <span class="bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5 rounded inline-block">視線瑕疵區</span>
+                                <div class="space-y-1">
+                                    <p class="text-xs text-rose-300 font-bold">視線說明：</p>
+                                    <p class="text-[11px] text-slate-300">場館本身的既有安全設施（如欄杆、牆壁等）會影響往主舞台(STAGE A)觀賞之視線。</p>
+                                </div>
+                                <div class="space-y-1 pt-1">
+                                    <p class="text-xs text-rose-300 font-bold">影響範圍：</p>
+                                    <p class="text-[11px] text-slate-300">L2、L3、L4、L5層看台各區前排座位。</p>
+                                </div>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">
+                                ※除上述公告區域外，其他座位入座後如有觀賞主舞台視線受阻之情形，須在開演10分鐘內向現場工作人員提出。經工作人員判定確認後調整座位，若無座位可以更換，消費者得辦理全額退票。無提出者，視為同意該座位安排。
+                            </p>
+                        </div>
+
+                        <!-- 雙舞台說明 -->
+                        <div class="bg-mayblue-900/10 border border-mayblue-900 rounded-xl p-5 space-y-2 text-center">
+                            <i class="fa-solid fa-masks-theater text-3xl text-esun-500 mb-2 block"></i>
+                            <h4 class="font-bold text-white text-sm">本次配備雙舞台 (STAGE A / B)</h4>
+                            <p class="text-xs text-slate-400">本場次共有 STAGE A (主舞台) 與 STAGE B (延伸舞台) 雙重演出空間，本說明之視線瑕疵僅針對藝人於主舞台 (STAGE A) 演出時。</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== SCREEN 2: 購票選區、座位、問答防機器人頁面 ==================== -->
+        <section id="screen-buy" class="tab-content hidden pb-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                
+                <!-- 購票進度條 -->
+                <div class="mb-8">
+                    <div class="flex items-center justify-between max-w-3xl mx-auto">
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 h-8 rounded-full bg-esun-500 text-white font-bold flex items-center justify-center text-sm ring-4 ring-esun-500/20 z-10" id="step-1-indicator">1</div>
+                            <span class="text-xs text-esun-500 mt-2 font-bold">選取座位區域</span>
+                        </div>
+                        <div class="flex-grow h-[2px] bg-mayblue-800 mx-2 -mt-6"></div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 h-8 rounded-full bg-mayblue-950 text-slate-400 font-bold flex items-center justify-center text-sm border-2 border-mayblue-800 z-10" id="step-2-indicator">2</div>
+                            <span class="text-xs text-slate-400 mt-2 font-medium" id="step-2-label">粉絲答題與張數</span>
+                        </div>
+                        <div class="flex-grow h-[2px] bg-mayblue-800 mx-2 -mt-6"></div>
+                        <div class="flex flex-col items-center flex-1">
+                            <div class="w-8 h-8 rounded-full bg-mayblue-950 text-slate-400 font-bold flex items-center justify-center text-sm border-2 border-mayblue-800 z-10" id="step-3-indicator">3</div>
+                            <span class="text-xs text-slate-400 mt-2 font-medium">填寫實名制資料</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 當前選擇場次資訊 -->
+                <div class="flex flex-wrap items-center justify-between gap-4 mb-6 bg-mayblue-900/30 p-4 rounded-xl border border-mayblue-800">
+                    <div class="flex items-center space-x-3">
+                        <button onclick="goBackToHome()" class="bg-mayblue-900 hover:bg-mayblue-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs transition border border-mayblue-700">
+                            <i class="fa-solid fa-arrow-left mr-1"></i> 返回場次列表
+                        </button>
+                        <div>
+                            <span class="bg-esun-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                                已選場次
+                            </span>
+                            <span class="ml-2 text-sm font-bold text-white font-mono" id="selected-session-title">2026-07-03 19:00</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-xs text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 搶票中，熱度：<span class="text-rose-400 font-bold">極高 🔥</span></span>
+                    </div>
+                </div>
+
+                <!-- 購票步驟 1: 選區、點擊座位圖 -->
+                <div id="buy-step-1" class="space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- 巨蛋互動 3D 座位圖 -->
+                        <div class="lg:col-span-2 bg-gradient-to-br from-[#010a12] to-[#041a2b] p-6 rounded-2xl border border-mayblue-800/80 shadow-2xl flex flex-col items-center">
+                            <h3 class="text-lg font-bold text-white mb-2 self-start flex items-center justify-between w-full">
+                                <span>大巨蛋「雙舞台」對號座選區圖</span>
+                                <span class="text-xs font-normal text-slate-400"><i class="fa-solid fa-hand-pointer text-esun-500 animate-bounce mr-1"></i> 請點選區域或看台</span>
+                            </h3>
+                            <p class="text-xs text-slate-400 self-start mb-6">點擊下方看台區、搖滾區色塊即可直接選擇該分區與套票類型。</p>
+                            
+                            <!-- 雙舞台 STAGE A/B 互動 SVG -->
+                            <div class="w-full max-w-[550px] aspect-square relative my-4 flex items-center justify-center">
+                                <svg id="stadium-svg" viewBox="0 0 500 500" class="w-full h-full">
+                                    <defs>
+                                        <radialGradient id="stageAGlow" cx="50%" cy="10%" r="55%">
+                                            <stop offset="0%" stop-color="#13b5b1" stop-opacity="0.7"/>
+                                            <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+                                        </radialGradient>
+                                        <radialGradient id="stageBGlow" cx="50%" cy="50%" r="25%">
+                                            <stop offset="0%" stop-color="#e879f9" stop-opacity="0.5"/>
+                                            <stop offset="100%" stop-color="#021320" stop-opacity="0"/>
+                                        </radialGradient>
+                                        <!-- 斜線紋理，用於視線瑕疵區視覺提示 -->
+                                        <pattern id="diagonalStripes" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                                            <line x1="0" y1="0" x2="0" y2="20" stroke="#f43f5e" stroke-width="4" stroke-opacity="0.4"/>
+                                        </pattern>
+                                    </defs>
+
+                                    <!-- 舞台 A 背景光芒 -->
+                                    <path d="M 150,50 L 250,250 L 350,50 Z" fill="url(#stageAGlow)" class="pointer-events-none"/>
+                                    <!-- 舞台 B 背景光芒 -->
+                                    <circle cx="250" cy="220" r="80" fill="url(#stageBGlow)" class="pointer-events-none"/>
+
+                                    <!-- 巨蛋外環背景輪廓 -->
+                                    <ellipse cx="250" cy="270" rx="220" ry="190" fill="none" stroke="#0f766e" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+                                    <!-- STAGE A 主舞台 (上方) -->
+                                    <rect x="150" y="55" width="200" height="30" rx="6" fill="#111827" stroke="#13b5b1" stroke-width="2"/>
+                                    <text x="250" y="75" fill="#13b5b1" font-size="11" font-weight="900" text-anchor="middle" letter-spacing="3">★ STAGE A (主舞台) ★</text>
+
+                                    <!-- STAGE B 延伸舞台 (中心) -->
+                                    <circle cx="250" cy="220" r="22" fill="#111827" stroke="#e879f9" stroke-width="2"/>
+                                    <text x="250" y="224" fill="#e879f9" font-size="8" font-weight="bold" text-anchor="middle">STAGE B</text>
+                                    <!-- 跑道 / 延伸花道 -->
+                                    <line x1="250" y1="85" x2="250" y2="198" stroke="#e879f9" stroke-width="4" stroke-dasharray="2,2"/>
+
+                                    <!-- 瘋狂世界 搖滾A區 (NT$ 5525) -->
+                                    <path d="M 160,100 Q 250,110 340,100 L 330,165 Q 250,175 170,165 Z" fill="#059669" fill-opacity="0.8" stroke="#a7f3d0" stroke-width="1.5" class="cursor-pointer hover:fill-opacity-100 transition duration-150" onclick="selectArea('瘋狂世界 搖滾A區', 5525)"/>
+                                    <text x="250" y="135" fill="#ffffff" font-size="11" font-weight="bold" text-anchor="middle" class="pointer-events-none">搖滾A區 (NT$ 5525)</text>
+
+                                    <!-- 瘋狂世界 搖滾B區 / 親子搖滾套票 (NT$ 4525) -->
+                                    <path d="M 170,175 Q 250,185 330,175 L 315,245 Q 250,255 185,245 Z" fill="#0d9488" fill-opacity="0.8" stroke="#99f6e4" stroke-width="1.5" class="cursor-pointer hover:fill-opacity-100 transition duration-150" onclick="selectArea('瘋狂世界 搖滾B區/親子套票', 4525)"/>
+                                    <text x="250" y="212" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" class="pointer-events-none">搖滾B區 (NT$ 4525)</text>
+
+                                    <!-- L1 看台特區 ($4225) -->
+                                    <path d="M 140,110 Q 70,180 70,270 Q 70,340 130,410 L 165,375 Q 110,315 110,270 Q 110,195 165,145 Z" fill="#0284c7" fill-opacity="0.8" stroke="#bae6fd" stroke-width="1.5" class="cursor-pointer hover:fill-opacity-100 transition duration-150" onclick="selectArea('L1看台精選區-西側', 4225)"/>
+                                    <text x="100" y="260" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" transform="rotate(-70, 100, 260)" class="pointer-events-none">L1西側看台 ($4225)</text>
+
+                                    <path d="M 360,110 Q 430,180 430,270 Q 430,340 370,410 L 335,375 Q 390,315 390,270 Q 390,195 335,145 Z" fill="#0284c7" fill-opacity="0.8" stroke="#bae6fd" stroke-width="1.5" class="cursor-pointer hover:fill-opacity-100 transition duration-150" onclick="selectArea('L1看台精選區-東側', 4225)"/>
+                                    <text x="400" y="260" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" transform="rotate(70, 400, 260)" class="pointer-events-none">L1東側看台 ($4225)</text>
+
+                                    <!-- L2/L3 中看台 ($3225 / $2225) -->
+                                    <path d="M 140,420 Q 250,480 360,420 L 330,390 Q 250,440 170,390 Z" fill="#ca8a04" fill-opacity="0.8" stroke="#fef08a" stroke-width="1.5" class="cursor-pointer hover:fill-opacity-100 transition duration-150" onclick="selectArea('L2/L3看台精選區', 3225)"/>
+                                    <text x="250" y="422" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" class="pointer-events-none">L2/L3 中看台 ($3225/2225)</text>
+
+                                    <!-- L4/L5 山頂輕快區 ($1525) -->
+                                    <path d="M 110,445 Q 250,520 390,445 L 370,415 Q 250,480 130,415 Z" fill="#4f46e5" fill-opacity="0.8" stroke="#c7d2fe" stroke-width="1" class="cursor-pointer hover:fill-opacity-100 transition duration-150" onclick="selectArea('L4/L5看台輕快區', 1525)"/>
+                                    <text x="250" y="465" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle" class="pointer-events-none">L4/L5 山頂區 ($1525)</text>
+
+                                    <!-- 視線瑕疵區 (安全設施遮擋線 - 紅色斜線疊加層) -->
+                                    <path d="M 140,420 Q 250,480 360,420 L 350,410 Q 250,470 150,410 Z" fill="url(#diagonalStripes)" class="pointer-events-none"/>
+                                    <path d="M 110,445 Q 250,520 390,445 L 380,435 Q 250,510 120,435 Z" fill="url(#diagonalStripes)" class="pointer-events-none"/>
+                                </svg>
+                            </div>
+                            <!-- 座位圖標例 -->
+                            <div class="flex flex-wrap gap-4 text-xs justify-center mt-2 border-t border-mayblue-900/60 pt-4 w-full">
+                                <span class="flex items-center"><span class="w-3 h-3 bg-emerald-600 inline-block mr-1.5 rounded"></span> 搖滾A區 ($5525)</span>
+                                <span class="flex items-center"><span class="w-3 h-3 bg-teal-600 inline-block mr-1.5 rounded"></span> 搖滾B區 / 親子 ($4525)</span>
+                                <span class="flex items-center"><span class="w-3 h-3 bg-sky-600 inline-block mr-1.5 rounded"></span> L1看台 ($4225)</span>
+                                <span class="flex items-center"><span class="w-3 h-3 bg-yellow-600 inline-block mr-1.5 rounded"></span> L2/L3看台 ($3225/2225)</span>
+                                <span class="flex items-center"><span class="w-3 h-3 bg-indigo-600 inline-block mr-1.5 rounded"></span> L4/L5山頂 ($1525)</span>
+                                <span class="flex items-center"><span class="w-4 h-3 border border-red-500 stripe-bg inline-block mr-1.5 rounded"></span> 視線瑕疵警告區</span>
+                            </div>
+                        </div>
+
+                        <!-- 快速選區與親子優惠票 -->
+                        <div class="space-y-6">
+                            <div class="bg-mayblue-900/40 p-6 rounded-2xl border border-mayblue-800">
+                                <h4 class="font-bold text-white mb-4 text-base border-b border-mayblue-800 pb-2 flex justify-between items-center">
+                                    <span>快速選取票價分區</span>
+                                    <span class="text-xs text-esun-500 font-bold">全對號座席</span>
+                                </h4>
+                                <div class="space-y-3 max-h-[420px] overflow-y-auto pr-2">
+                                    <!-- 搖滾A -->
+                                    <button onclick="selectArea('瘋狂世界 搖滾A區', 5525)" class="w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-emerald-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-emerald-400 font-bold block">NT$ 5,525</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-emerald-300">瘋狂世界 搖滾A區</span>
+                                        </div>
+                                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">有票</span>
+                                    </button>
+
+                                    <!-- 搖滾B -->
+                                    <button onclick="selectArea('瘋狂世界 搖滾B區', 4525)" class="w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-teal-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-teal-400 font-bold block">NT$ 4,525</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-teal-300">瘋狂世界 搖滾B區</span>
+                                        </div>
+                                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">有票</span>
+                                    </button>
+
+                                    <!-- 搖滾親子套票 -->
+                                    <button onclick="selectArea('瘋狂世界 搖滾區 - 親子套票', 4225)" class="w-full text-left p-3 rounded-lg bg-esun-500/5 border border-esun-500/30 hover:border-esun-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-esun-500 font-bold block">NT$ 4,225 (優惠票)</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-esun-400">搖滾B區 親子套票</span>
+                                        </div>
+                                        <span class="text-[10px] bg-esun-500/20 text-esun-500 px-2 py-0.5 rounded font-bold">有票</span>
+                                    </button>
+
+                                    <!-- L1 東看台 -->
+                                    <button onclick="selectArea('L1看台精選區-東側', 4225)" class="w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-sky-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-sky-400 font-bold block">NT$ 4,225</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-sky-300">L1 東看台 (100-200區)</span>
+                                        </div>
+                                        <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-bold">極少</span>
+                                    </button>
+
+                                    <!-- L1 西看台 -->
+                                    <button onclick="selectArea('L1看台精選區-西側', 4225)" class="w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-sky-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-sky-400 font-bold block">NT$ 4,225</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-sky-300">L1 西看台 (100-200區)</span>
+                                        </div>
+                                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">有票</span>
+                                    </button>
+
+                                    <!-- L2/L3 中看台 -->
+                                    <button onclick="selectArea('L2/L3看台精選區', 3225)" class="w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-yellow-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-yellow-400 font-bold block">NT$ 3,225 / 2,225</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-yellow-300">L2/L3 看台對號區</span>
+                                        </div>
+                                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">有票</span>
+                                    </button>
+
+                                    <!-- L2/L3 看台親子套票 -->
+                                    <button onclick="selectArea('L2/L3看台精選區 - 親子套票', 3225)" class="w-full text-left p-3 rounded-lg bg-esun-500/5 border border-esun-500/30 hover:border-esun-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-esun-500 font-bold block">NT$ 3,225 / 2,225</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-esun-400">看台 親子套票 (長者適用)</span>
+                                        </div>
+                                        <span class="text-[10px] bg-esun-500/20 text-esun-500 px-2 py-0.5 rounded font-bold">有票</span>
+                                    </button>
+
+                                    <!-- 身障席 -->
+                                    <button onclick="selectArea('看台身障席A', 2112)" class="w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-rose-500 transition flex items-center justify-between group">
+                                        <div>
+                                            <span class="text-xs text-rose-400 font-bold block">NT$ 2,112</span>
+                                            <span class="font-bold text-white text-sm group-hover:text-rose-300">看台身障席 A (輪椅專屬)</span>
+                                        </div>
+                                        <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">有票</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="bg-rose-500/10 border border-rose-500/20 rounded-2xl p-6 text-center stripe-bg">
+                                <span class="text-rose-400 font-bold block text-sm mb-1">【視線瑕疵警告提示】</span>
+                                <p class="text-xs text-slate-300 leading-relaxed">選擇 L2、L3、L4、L5 各看台前排位置時，既有安全護欄與走道欄杆可能會部分阻擋主舞台演出視線，請斟酌選取。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 購票步驟 2: 答題防機器人驗證、票價與張數 -->
+                <div id="buy-step-2" class="hidden max-w-2xl mx-auto">
+                    <div class="bg-gradient-to-b from-mayblue-900 to-mayblue-950 p-8 rounded-2xl border border-mayblue-800 shadow-2xl space-y-6">
+                        <div class="text-center">
+                            <i class="fa-solid fa-user-shield text-4xl text-esun-500 mb-2"></i>
+                            <h3 class="text-xl font-black text-white">五月天粉絲專屬驗證 (防機器人)</h3>
+                            <p class="text-xs text-slate-400 mt-1">請作答以下關於五月天之題目，作答正確即可解鎖購票張數選擇權限。</p>
+                        </div>
+
+                        <!-- 當前選擇區域提示 -->
+                        <div class="bg-mayblue-950 p-4 rounded-xl border border-mayblue-800 flex justify-between items-center">
+                            <div>
+                                <span class="text-xs text-slate-400 block">所選座位區域</span>
+                                <span class="text-base font-bold text-white" id="step-2-selected-area">瘋狂世界 搖滾A區</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-400 block">票價</span>
+                                <span class="text-lg font-black text-esun-500" id="step-2-selected-price">NT$ 5,525</span>
+                            </div>
+                        </div>
+
+                        <!-- 防機器人考題區 -->
+                        <div class="bg-black/40 p-5 rounded-xl border border-mayblue-800/80 space-y-4">
+                            <span class="bg-rose-500/25 text-rose-300 text-xs px-2.5 py-1 rounded-full font-bold inline-block">題目驗證 (防機器人與搶票黃牛)</span>
+                            <div class="space-y-3">
+                                <p class="text-sm font-bold text-slate-200" id="captcha-question">五月天「回到那一天」25週年巡迴演唱會，其核心舞台主視覺與極限動態裝置被稱為什麼？</p>
+                                <div class="space-y-2 mt-3" id="captcha-options">
+                                    <!-- 動態產生選項 -->
+                                </div>
+                            </div>
+                            <div id="captcha-feedback" class="text-xs mt-2 hidden"></div>
+                        </div>
+
+                        <!-- 選擇張數 (答對解鎖) -->
+                        <div class="space-y-3 opacity-40 transition-opacity duration-300" id="quantity-section">
+                            <label class="block text-sm font-bold text-slate-300">選擇購票張數 <span class="text-xs font-normal text-slate-400">(實名制單筆訂單限購最多 2 張)</span></label>
+                            <div class="flex items-center space-x-4">
+                                <button onclick="adjustQty(-1)" id="qty-minus" disabled class="w-10 h-10 bg-mayblue-900 border border-mayblue-800 rounded-lg flex items-center justify-center font-bold text-white hover:bg-mayblue-800 transition disabled:opacity-50">-</button>
+                                <input type="text" id="ticket-qty" value="1" readonly class="w-16 h-10 bg-mayblue-950 border border-mayblue-800 text-center text-lg font-mono font-bold text-white rounded-lg focus:outline-none">
+                                <button onclick="adjustQty(1)" id="qty-plus" disabled class="w-10 h-10 bg-mayblue-900 border border-mayblue-800 rounded-lg flex items-center justify-center font-bold text-white hover:bg-mayblue-800 transition disabled:opacity-50">+</button>
+                            </div>
+                        </div>
+
+                        <!-- 親子套票規範確認 -->
+                        <div id="family-kit-check" class="hidden bg-esun-500/5 border border-esun-500/20 p-4 rounded-xl space-y-2">
+                            <label class="flex items-start space-x-2 cursor-pointer">
+                                <input type="checkbox" id="family-agree" class="mt-1 text-esun-500 focus:ring-esun-500">
+                                <span class="text-xs text-slate-300">
+                                    【親子套票聲明確認】我已詳閱規範，理解本套票適用於家長與孩童，或包含年滿60歲以上長者。入場時需出示有效證明文件，否則應現場補足原價差額方能入場。
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- 按鈕操作 -->
+                        <div class="flex space-x-4 pt-4">
+                            <button onclick="goToStep(1)" class="flex-1 bg-mayblue-900 hover:bg-mayblue-800 text-slate-300 font-bold py-3 px-4 rounded-xl transition border border-mayblue-700 text-center">
+                                回上一步選區
+                            </button>
+                            <button id="btn-submit-captcha" onclick="verifyCaptchaAndProceed()" disabled class="flex-1 bg-esun-500 hover:bg-esun-600 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-esun-500/20 disabled:opacity-50 disabled:cursor-not-allowed text-center">
+                                驗證並填寫資料
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 購票步驟 3: 填寫實名制資料與結帳頁面 -->
+                <div id="buy-step-3" class="hidden max-w-3xl mx-auto space-y-6">
+                    <!-- 搶票倒數保留器 -->
+                    <div class="bg-rose-500/10 border border-rose-500/30 p-4 rounded-xl flex items-center justify-between text-sm">
+                        <span class="text-slate-300 flex items-center"><i class="fa-solid fa-hourglass-half text-rose-400 mr-2 animate-spin"></i> 座位已被保留！請在倒數時間內完成訂購，逾時將自動釋出</span>
+                        <div class="bg-rose-500 text-white font-black font-mono px-3 py-1 rounded text-base animate-pulse" id="reservation-timer">10:00</div>
+                    </div>
+
+                    <!-- 購票與訂單資訊卡 -->
+                    <div class="bg-mayblue-900/40 p-6 rounded-2xl border border-mayblue-800">
+                        <h4 class="font-bold text-white mb-4 text-lg border-b border-mayblue-800 pb-2">訂購明細與實名制登錄</h4>
+                        <div class="space-y-4">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">訂購項目：</span>
+                                <span class="text-slate-100 font-bold">五月天 2026 [ #5525+2 回到那一天 ] 台北站</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">票價區域：</span>
+                                <span class="text-white font-bold" id="step-3-area-display">瘋狂世界 搖滾A區</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">單張票價：</span>
+                                <span class="text-white font-bold font-mono" id="step-3-single-price-display">NT$ 5,525</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span class="text-slate-400">訂購張數：</span>
+                                <span class="text-white font-bold font-mono" id="step-3-qty-display">1</span>
+                            </div>
+                            <div class="flex justify-between text-sm border-t border-mayblue-900 pt-3">
+                                <span class="text-slate-400 text-base font-bold">訂單總金額：</span>
+                                <span class="text-xl font-black text-rose-400 font-mono" id="step-3-total-price">NT$ 5,525</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 實名制名單填寫欄 -->
+                    <div class="bg-mayblue-900/40 p-6 rounded-2xl border border-mayblue-800 space-y-4">
+                        <h4 class="font-bold text-white text-lg border-b border-mayblue-800 pb-2">持票人身分實名登錄</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed">請仔細填寫持票人的真實姓名與身分證號。入場時必須出示對應證件（身分證、健保卡或護照正本），資料不符者將無法入場。</p>
+                        
+                        <!-- 動態產生持票人欄位區 -->
+                        <div class="space-y-6 pt-2" id="buyer-forms-container">
+                            <!-- JS將依據購票張數動態渲染 -->
+                        </div>
+                    </div>
+
+                    <!-- 虛擬付款方式 -->
+                    <div class="bg-mayblue-900/40 p-6 rounded-2xl border border-mayblue-800 space-y-4">
+                        <h4 class="font-bold text-white text-lg border-b border-mayblue-800 pb-2">付款方式選擇</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <label class="bg-mayblue-950 p-4 rounded-xl border border-esun-500 flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="payment_method" value="esun" checked class="text-esun-500 focus:ring-esun-500">
+                                    <div>
+                                        <span class="text-sm font-bold text-white block">玉山銀行卡友線上刷卡</span>
+                                        <span class="text-[10px] text-esun-500">玉山信用卡尊享 30 秒秒速結帳</span>
+                                    </div>
+                                </div>
+                                <i class="fa-solid fa-credit-card text-xl text-esun-500"></i>
+                            </label>
+
+                            <label class="bg-mayblue-950 p-4 rounded-xl border border-mayblue-800 hover:border-mayblue-700 flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center space-x-3">
+                                    <input type="radio" name="payment_method" value="credit" class="text-esun-500 focus:ring-esun-500">
+                                    <div>
+                                        <span class="text-sm font-bold text-white block">其他線上信用卡刷卡</span>
+                                        <span class="text-[10px] text-slate-400">支援 VISA / MasterCard / JCB</span>
+                                    </div>
+                                </div>
+                                <i class="fa-regular fa-credit-card text-xl text-slate-400"></i>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 購票按鈕與最後聲明 -->
+                    <div class="space-y-4">
+                        <label class="flex items-start space-x-2 cursor-pointer">
+                            <input type="checkbox" id="agree-terms" class="mt-1 text-esun-500 focus:ring-esun-500">
+                            <span class="text-xs text-slate-300">
+                                我已詳閱並充分理解本次購票之視線瑕疵區公告、親子套票規則及退票退票條款（限購票後3日內辦理退票且收取5%手續費）。我保證填寫之姓名與身分證完全屬實。
+                            </span>
+                        </label>
+                        <button onclick="submitOrder()" class="w-full bg-gradient-to-r from-esun-500 to-esun-600 hover:from-esun-600 hover:to-esun-700 text-white font-black py-4 px-6 rounded-xl text-base text-center shadow-lg shadow-esun-500/20 transition-all duration-300 tracking-widest hover:scale-[1.01]">
+                            確認訂單無誤，確認付款並出票
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ==================== SCREEN 3: 購票成功 (精緻電子票券畫面) ==================== -->
+        <section id="screen-success" class="tab-content hidden pb-24">
+            <div class="max-w-2xl mx-auto px-4 py-12 text-center space-y-8">
+                <div class="inline-flex h-20 w-20 items-center justify-center rounded-full bg-esun-500/10 border border-esun-500/30 text-esun-500 text-4xl animate-bounce">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-black text-white tracking-wide">恭喜您！門票訂購成功！</h2>
+                    <p class="text-sm text-esun-500 font-bold">拓元開票系統已自動將電子票卡載入您的「我的票券」</p>
+                    <p class="text-xs text-slate-400">演唱會當日憑此電子票券之動態 QR Code、及持票人身分證正本核對即可進場。</p>
+                </div>
+
+                <!-- 虛擬電子卡 -->
+                <div class="bg-gradient-to-br from-[#0a233a] to-[#031525] border border-esun-500/30 rounded-3xl p-6 shadow-2xl relative overflow-hidden text-left max-w-md mx-auto">
+                    <!-- 虛擬防偽動態背景 -->
+                    <div class="absolute inset-0 opacity-10 pointer-events-none glow-bg">
+                        <div class="absolute w-[200px] h-[200px] bg-esun-500 rounded-full blur-[60px] top-10 right-10"></div>
+                    </div>
+                    
+                    <!-- 虛擬鋸齒切角 (門票造型) -->
+                    <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-mayblue-950 rounded-full border-r border-esun-500/30"></div>
+                    <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-mayblue-950 rounded-full border-l border-esun-500/30"></div>
+
+                    <!-- 票卡頂部 -->
+                    <div class="flex justify-between items-center border-b border-mayblue-900 pb-4 mb-4">
+                        <span class="text-xs font-bold text-esun-500 tracking-wider">MAYDAY 25TH TICKET</span>
+                        <span class="text-xs font-mono font-bold bg-mayblue-950 px-2.5 py-1 rounded-full border border-mayblue-800 text-slate-300">實名認證特區</span>
+                    </div>
+
+                    <!-- 票卡中段：演唱會核心詳情 -->
+                    <div class="space-y-3">
+                        <h4 class="text-lg font-black text-white tracking-wide">
+                            五月天 2026 [ #5525+2 回到那一天 ] 台北站
+                        </h4>
+                        <div class="grid grid-cols-2 gap-4 pt-1">
+                            <div>
+                                <span class="text-[10px] text-slate-400 block uppercase font-medium">場次日期 Date</span>
+                                <span id="success-date" class="text-sm font-bold text-slate-200 font-mono">2026-07-03</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block uppercase font-medium">開演時間 Time</span>
+                                <span id="success-time" class="text-sm font-bold text-slate-200 font-mono">19:00</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block uppercase font-medium">座位區域 Section</span>
+                                <span id="success-area" class="text-sm font-bold text-esun-500">瘋狂世界 搖滾A區</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 block uppercase font-medium">票數門檻 Qty</span>
+                                <span id="success-qty" class="text-sm font-bold text-slate-200 font-mono">1 張</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 票卡下段：實名登載 -->
+                    <div class="mt-4 pt-4 border-t border-dashed border-mayblue-900 space-y-2">
+                        <span class="text-[10px] text-slate-400 block uppercase font-medium">實名認證持票人</span>
+                        <div class="space-y-1 text-xs" id="success-buyers-list">
+                            <!-- JS將會動態填寫持卡人與證件 -->
+                        </div>
+                    </div>
+
+                    <!-- 二維碼 -->
+                    <div class="mt-6 pt-4 border-t border-mayblue-900 flex items-center justify-between gap-4">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">拓元電子票券識別碼</span>
+                            <span class="text-xs font-mono font-bold text-slate-300 block" id="success-order-id">TXC-005525-MD</span>
+                            <span class="text-[9px] text-esun-500 mt-1 block"><i class="fa-solid fa-spinner animate-spin mr-1"></i> 安全動態防偽更新中...</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl flex items-center justify-center">
+                            <div class="relative w-16 h-16 bg-slate-900 rounded-md overflow-hidden flex items-center justify-center">
+                                <i class="fa-solid fa-qrcode text-5xl text-white"></i>
+                                <div class="absolute w-full h-0.5 bg-esun-500 top-0 left-0 animate-[bounce_2s_infinite]"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 導覽按鈕 -->
+                <div class="flex justify-center space-x-4 max-w-md mx-auto">
+                    <button onclick="switchTab('orders')" class="flex-1 bg-esun-500 hover:bg-esun-600 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg shadow-esun-500/10">
+                        <i class="fa-solid fa-ticket mr-2"></i> 前往我的電子票夾
+                    </button>
+                    <button onclick="switchTab('home')" class="flex-1 bg-mayblue-900 hover:bg-mayblue-800 text-slate-300 font-bold py-3 px-4 rounded-xl transition border border-mayblue-700">
+                        回首頁
+                    </button>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== SCREEN 4: 我的票券 (電子票夾) ==================== -->
+        <section id="screen-orders" class="tab-content hidden pb-24">
+            <div class="max-w-4xl mx-auto px-4 py-8">
+                <h2 class="text-2xl font-black text-white border-l-4 border-esun-500 pl-3 mb-6">我的電子票夾</h2>
+                
+                <!-- 空狀態 -->
+                <div id="no-tickets-view" class="bg-mayblue-900/10 border border-mayblue-900 rounded-2xl p-12 text-center space-y-4">
+                    <i class="fa-solid fa-ticket-simple text-6xl text-mayblue-800"></i>
+                    <h3 class="text-lg font-bold text-slate-300">您的電子票夾目前是空的</h3>
+                    <p class="text-xs text-slate-400 max-w-sm mx-auto">尚未成功訂購任何演唱會門票。五月天 [ #5525+2 回到那一天 ] 大巨蛋場次熱烈搶購中，快去首頁挑選吧！</p>
+                    <button onclick="switchTab('home')" class="bg-esun-500 hover:bg-esun-600 text-white font-bold py-2.5 px-6 rounded-xl transition text-sm">
+                        立即前往首頁購票
+                    </button>
+                </div>
+
+                <!-- 票券列表區 -->
+                <div id="tickets-list-container" class="hidden grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 動態注入電子票卡 -->
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== SCREEN 5: 購票須知與常見問題 ==================== -->
+        <section id="screen-rules" class="tab-content hidden pb-24">
+            <div class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+                <div>
+                    <h2 class="text-2xl font-black text-white border-l-4 border-esun-500 pl-3 mb-6">購票須知與實名制規範說明</h2>
+                    <p class="text-sm text-slate-400">為了防止不正當管道洗票與黃牛炒作，本演唱會採取嚴格實名制。購票前請仔細閱讀並同意以下各項規範。</p>
+                </div>
+
+                <!-- Q&A 手風琴 -->
+                <div class="space-y-4">
+                    <div class="bg-mayblue-900/30 border border-mayblue-800 rounded-xl p-5">
+                        <h3 class="font-bold text-white text-base flex items-center mb-2">
+                            <span class="bg-esun-500 text-white text-xs w-5 h-5 rounded-full inline-flex items-center justify-center font-bold mr-2">Q</span>
+                            什麼是實名制？進場時要如何驗證身分？
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed pl-7">
+                            本場次每張票券均需在購票時填寫對應的「持票人真實姓名」與「身分證件字號」。當天進場時，必須出示持票人本人的「中華民國身分證正本」、「健保卡正本」或「護照正本」（限外籍人士），核對無誤後始可入場。
+                        </p>
+                    </div>
+
+                    <div class="bg-mayblue-900/30 border border-mayblue-800 rounded-xl p-5">
+                        <h3 class="font-bold text-white text-base flex items-center mb-2">
+                            <span class="bg-esun-500 text-white text-xs w-5 h-5 rounded-full inline-flex items-center justify-center font-bold mr-2">Q</span>
+                            親子套票的查驗與規範為何？
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed pl-7">
+                            本次親子套票納入「年滿 60歲以上長者」。現場經查驗如有不符規定者，應補足與原票價之差額方可取票入場。若有剩餘座位，主辦單位有權將座位以原票價釋出販售。
+                        </p>
+                    </div>
+
+                    <div class="bg-mayblue-900/30 border border-mayblue-800 rounded-xl p-5">
+                        <h3 class="font-bold text-white text-base flex items-center mb-2">
+                            <span class="bg-esun-500 text-white text-xs w-5 h-5 rounded-full inline-flex items-center justify-center font-bold mr-2">Q</span>
+                            退票規定與期限為何？
+                        </h3>
+                        <p class="text-xs text-slate-300 leading-relaxed pl-7">
+                            退票需在購票後3日內辦理（不含購票當日），且需扣除票面金額 5% 作為手續費，逾期恕不接受退票。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 場館交通 -->
+                <div class="bg-gradient-to-br from-mayblue-900/40 to-mayblue-950 p-6 rounded-2xl border border-mayblue-800 space-y-4">
+                    <h3 class="font-bold text-white text-lg border-b border-mayblue-800 pb-2">臺北大巨蛋交通指南與入場動線</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs leading-relaxed">
+                        <div class="space-y-2">
+                            <span class="font-bold text-esun-500 block text-sm"><i class="fa-solid fa-train-subway mr-1.5"></i> 捷運與公共交通</span>
+                            <p class="text-slate-300">
+                                <strong>捷運：</strong> 搭乘捷運板南線至<strong>「國父紀念館站」</strong>，經由 5 號出口直接連通臺北大巨蛋地下通道。
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <span class="font-bold text-rose-400 block text-sm"><i class="fa-solid fa-person-walking-arrow-right mr-1.5"></i> 進場動線提示</span>
+                            <p class="text-slate-300">
+                                <strong>搖滾區：</strong> 由大巨蛋地面層之 Gate 1 或 Gate 20 專屬通道經扶梯前往地下 B1。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 頁腳 (Footer) -->
+    <footer class="bg-mayblue-950 border-t border-mayblue-900/80 py-10 text-xs text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+            
+            <!-- 重要聲明欄位 -->
+            <div class="bg-black/30 p-5 rounded-xl border border-mayblue-900/50 space-y-2 leading-relaxed text-[11px] text-slate-300">
+                <p>※本平台所售出之活動，除非特別標示，皆無提供履約保障機制。</p>
+                <p>※購買票券前，請先了解並同意以上規範，如不同意請勿購買，以免產生不必要之糾紛及損害；當進行購票及退票作業時，將視同您已瞭解並同意遵守以上全部事項。</p>
+            </div>
+
+            <!-- 客戶服務與消費爭議處理 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-mayblue-900/40 text-[11px]">
+                <div class="space-y-2">
+                    <h4 class="font-bold text-white text-sm">客戶服務及消費爭議處理</h4>
+                    <p>票務服務單位：拓元股份有限公司／統一編號 54651107</p>
+                    <p>客服專線：+886 (02) 8772-9835</p>
+                    <p>客服信箱：<a href="mailto:support@tixcraft.com" class="text-esun-500 hover:underline">聯繫我們</a></p>
+                    <p>客服時間：週一 ~ 週五 10:00-12:30 | 13:30-18:00 (國定假日暫停服務)</p>
+                </div>
+                
+                <div class="space-y-2">
+                    <h4 class="font-bold text-white text-sm">相關連結</h4>
+                    <div class="flex flex-col space-y-1.5">
+                        <a href="#rules" onclick="switchTab('rules')" class="hover:text-esun-500 transition-colors">關於拓元</a>
+                        <a href="#rules" onclick="switchTab('rules')" class="hover:text-esun-500 transition-colors">會員服務條款</a>
+                        <a href="#rules" onclick="switchTab('rules')" class="hover:text-esun-500 transition-colors">隱私權政策</a>
+                        <a href="#rules" onclick="switchTab('rules')" class="hover:text-esun-500 transition-colors">Cookie 偏好設定</a>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="bg-esun-500/10 border border-esun-500/20 p-3 rounded-lg flex items-center space-x-2">
+                        <span class="bg-white text-esun-600 px-1 rounded text-[9px] font-black">E.SUN</span>
+                        <span class="text-slate-200">專屬刷卡通道由玉山銀行全程加密維護。</span>
+                    </div>
+                    <p class="text-[10px] text-rose-400">※ 非官方授權，本網頁僅為前端高擬真售票模擬系統（ Gem Prototype ）。</p>
+                </div>
+            </div>
+
+            <!-- 版權歸屬與免責 -->
+            <div class="text-center pt-6 border-t border-mayblue-900/40 text-[10px] space-y-1">
+                <p>© tixCraft, a company of Ticketmaster group. All rights reserved.</p>
+                <p>相信音樂版權所有｜© 2026 B’in Music All Rights Reserved. 非官方授權，不得使用本網站的所有信息資料。</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 自訂美化對話盒 (Modal) -->
+    <div id="custom-modal" class="fixed inset-0 z-[100] flex items-center justify-center hidden">
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm"></div>
+        <div class="relative bg-mayblue-900 border border-mayblue-700 max-w-sm w-full mx-4 rounded-2xl p-6 shadow-2xl text-center space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div id="modal-icon-container" class="mx-auto h-12 w-12 rounded-full flex items-center justify-center text-2xl">
+                <!-- 圖示動態載入 -->
+            </div>
+            <h4 id="modal-title" class="text-lg font-bold text-white">通知提示</h4>
+            <p id="modal-message" class="text-xs text-slate-300 leading-relaxed">這是預設的提示文字。</p>
+            <button onclick="closeModal()" id="modal-btn" class="w-full bg-esun-500 hover:bg-esun-600 text-white font-bold py-2 rounded-lg text-sm transition">
+                確認
+            </button>
+        </div>
+    </div>
+
+
+    <!-- 核心 JavaScript 邏輯 -->
+    <script>
+        // 全域應用狀態
+        const appState = {
+            currentTab: 'home',
+            selectedSession: null,
+            selectedTime: null,
+            selectedArea: null,
+            selectedPrice: 0,
+            ticketQuantity: 1,
+            reservationTimer: null,
+            reservationTimeRemaining: 600, // 10分鐘
+            orders: [], // 儲存已買到的票券
+            currentCaptcha: null,
+            captchaSolved: false,
+            // 五月天答題題庫
+            captchaPool: [
+                {
+                    question: "2024-2026年五月天「回到那一天」25週年巡迴演唱會，其核心舞台主視覺與極限動態裝置被稱為什麼？",
+                    options: [
+                        { text: "時光機天幕 / 飛天時光膠囊", correct: true },
+                        { text: "諾亞方舟 / 生物發光舞台", correct: false },
+                        { text: "DNA雙螺旋 / 航空母艦舞台", correct: false },
+                        { text: "人生無限公司 / 變形金剛基地", correct: false }
+                    ]
+                },
+                {
+                    question: "五月天鼓手「冠佑」在加入五月天之前，曾在地下樂團界使用過哪個藝名？",
+                    options: [
+                        { text: "諺明", correct: true },
+                        { text: "昇晏", correct: false },
+                        { text: "阿信", correct: false },
+                        { text: "錦航", correct: false }
+                    ]
+                },
+                {
+                    question: "五月天的第一場大型巡迴演唱會「第168場演唱會」，是在西元哪一年舉辦的？",
+                    options: [
+                        { text: "1999年", correct: true },
+                        { text: "2001年", correct: false },
+                        { text: "1997年", correct: false },
+                        { text: "2003年", correct: false }
+                    ]
+                },
+                {
+                    question: "本次回到那一天 25 週年大巨蛋巡迴演唱會，本售票網站冠名贊助夥伴為哪家銀行？",
+                    options: [
+                        { text: "玉山銀行", correct: true },
+                        { text: "國泰世華銀行", correct: false },
+                        { text: "台新銀行", correct: false },
+                        { text: "中國信託銀行", correct: false }
+                    ]
+                }
+            ]
+        };
+
+        // 頁面初始化
+        window.onload = function() {
+            loadSavedTickets();
+            switchTab('home');
+        };
+
+        // Tab 切換
+        function switchTab(tabName) {
+            appState.currentTab = tabName;
+            
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+            
+            const targetScreen = document.getElementById(`screen-${tabName}`);
+            if (targetScreen) {
+                targetScreen.classList.remove('hidden');
+                targetScreen.classList.add('block');
+            }
+
+            // 更新導航選單狀態
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-white', 'font-bold', 'border-b-2', 'border-esun-500');
+                link.classList.add('text-slate-300');
+            });
+            const activeNav = document.getElementById(`nav-${tabName}`);
+            if (activeNav) {
+                activeNav.classList.remove('text-slate-300');
+                activeNav.classList.add('text-white', 'font-bold', 'border-b-2', 'border-esun-500');
+            }
+
+            if (tabName === 'orders') {
+                renderTicketsWallet();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 開始選座位與選區流程
+        function startBooking(sessionDate, sessionTime) {
+            appState.selectedSession = sessionDate;
+            appState.selectedTime = sessionTime;
+            document.getElementById('selected-session-title').innerText = `${sessionDate} ${sessionTime} (臺北大巨蛋)`;
+            
+            // 重置臨時選購資料
+            appState.selectedArea = null;
+            appState.selectedPrice = 0;
+            appState.ticketQuantity = 1;
+            appState.captchaSolved = false;
+
+            switchTab('buy');
+            goToStep(1);
+        }
+
+        // 購票步驟跳轉
+        function goToStep(stepNum) {
+            document.getElementById('buy-step-1').classList.add('hidden');
+            document.getElementById('buy-step-2').classList.add('hidden');
+            document.getElementById('buy-step-3').classList.add('hidden');
+
+            resetStepIndicators();
+
+            if (stepNum === 1) {
+                document.getElementById('buy-step-1').classList.remove('hidden');
+                document.getElementById('step-1-indicator').classList.add('bg-esun-500', 'text-white');
+                document.getElementById('step-1-indicator').classList.remove('bg-mayblue-950', 'text-slate-400');
+            } else if (stepNum === 2) {
+                document.getElementById('buy-step-2').classList.remove('hidden');
+                document.getElementById('step-2-indicator').classList.add('bg-esun-500', 'text-white');
+                document.getElementById('step-2-indicator').classList.remove('bg-mayblue-950', 'text-slate-400');
+                generateCaptcha();
+            } else if (stepNum === 3) {
+                document.getElementById('buy-step-3').classList.remove('hidden');
+                document.getElementById('step-3-indicator').classList.add('bg-esun-500', 'text-white');
+                document.getElementById('step-3-indicator').classList.remove('bg-mayblue-950', 'text-slate-400');
+                
+                setupStep3Details();
+                startReservationTimer();
+            }
+        }
+
+        function resetStepIndicators() {
+            const indicators = ['step-1-indicator', 'step-2-indicator', 'step-3-indicator'];
+            indicators.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('bg-esun-500', 'text-white');
+                el.classList.add('bg-mayblue-950', 'text-slate-400');
+            });
+        }
+
+        function goBackToHome() {
+            if (appState.reservationTimer) {
+                clearInterval(appState.reservationTimer);
+            }
+            switchTab('home');
+        }
+
+        // 選擇座位分區
+        function selectArea(areaName, price) {
+            appState.selectedArea = areaName;
+            appState.selectedPrice = price;
+
+            document.getElementById('step-2-selected-area').innerText = areaName;
+            document.getElementById('step-2-selected-price').innerText = `NT$ ${price.toLocaleString()}`;
+
+            // 親子套票顯示聲明條款勾選框
+            const familyKitDiv = document.getElementById('family-kit-check');
+            if (areaName.includes('親子套票')) {
+                familyKitDiv.classList.remove('hidden');
+                document.getElementById('family-agree').checked = false;
+            } else {
+                familyKitDiv.classList.add('hidden');
+            }
+
+            goToStep(2);
+        }
+
+        // 動態生成五月天防黃牛考題
+        function generateCaptcha() {
+            appState.captchaSolved = false;
+            
+            const randomIndex = Math.floor(Math.random() * appState.captchaPool.length);
+            const questionObj = appState.captchaPool[randomIndex];
+            appState.currentCaptcha = questionObj;
+
+            document.getElementById('captcha-question').innerText = questionObj.question;
+            
+            const optionsContainer = document.getElementById('captcha-options');
+            optionsContainer.innerHTML = '';
+            
+            // 隨機排序選項
+            const shuffledOptions = [...questionObj.options].sort(() => Math.random() - 0.5);
+            shuffledOptions.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = "w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-esun-500 hover:bg-mayblue-900 transition text-sm text-slate-300 flex items-center justify-between group";
+                btn.onclick = () => selectCaptchaOption(opt, btn);
+                btn.innerHTML = `
+                    <span>${String.fromCharCode(65 + idx)}. ${opt.text}</span>
+                    <i class="fa-regular fa-circle text-slate-500 group-hover:text-esun-500"></i>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('quantity-section').classList.add('opacity-40');
+            document.getElementById('qty-minus').disabled = true;
+            document.getElementById('qty-plus').disabled = true;
+            document.getElementById('btn-submit-captcha').disabled = true;
+            
+            const feedback = document.getElementById('captcha-feedback');
+            feedback.classList.add('hidden');
+        }
+
+        function selectCaptchaOption(option, btnElement) {
+            const optionsContainer = document.getElementById('captcha-options');
+            optionsContainer.querySelectorAll('button').forEach(btn => {
+                btn.className = "w-full text-left p-3 rounded-lg bg-mayblue-950 border border-mayblue-800 hover:border-esun-500 hover:bg-mayblue-900 transition text-sm text-slate-300 flex items-center justify-between group";
+                btn.querySelector('i').className = "fa-regular fa-circle text-slate-500";
+            });
+
+            const feedback = document.getElementById('captcha-feedback');
+            feedback.classList.remove('hidden', 'text-emerald-400', 'text-rose-400');
+
+            if (option.correct) {
+                btnElement.className = "w-full text-left p-3 rounded-lg bg-emerald-950 border-2 border-emerald-500 text-sm text-emerald-200 flex items-center justify-between";
+                btnElement.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
+                
+                feedback.innerText = "✓ 驗證通過！正確答案，您是真實歌迷。請選擇張數後繼續。";
+                feedback.classList.add('text-emerald-400');
+
+                appState.captchaSolved = true;
+                document.getElementById('quantity-section').classList.remove('opacity-40');
+                document.getElementById('qty-minus').disabled = false;
+                document.getElementById('qty-plus').disabled = false;
+                document.getElementById('btn-submit-captcha').disabled = false;
+            } else {
+                btnElement.className = "w-full text-left p-3 rounded-lg bg-rose-950 border-2 border-rose-500 text-sm text-rose-200 flex items-center justify-between";
+                btnElement.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400";
+                
+                feedback.innerText = "✗ 回答錯誤。非真實歌迷或機器人無法通過實名制驗證，請再試一次。";
+                feedback.classList.add('text-rose-400');
+
+                appState.captchaSolved = false;
+                document.getElementById('quantity-section').classList.add('opacity-40');
+                document.getElementById('qty-minus').disabled = true;
+                document.getElementById('qty-plus').disabled = true;
+                document.getElementById('btn-submit-captcha').disabled = true;
+            }
+        }
+
+        // 增減購票數量
+        function adjustQty(amount) {
+            if (!appState.captchaSolved) return;
+            
+            let currentQty = parseInt(document.getElementById('ticket-qty').value);
+            currentQty += amount;
+            
+            if (currentQty < 1) currentQty = 1;
+            if (currentQty > 2) {
+                currentQty = 2;
+                showModal('warning', '購票數量上限', '為維護公平權益，實名制購票每筆訂單限購最高兩張。');
+            }
+            
+            document.getElementById('ticket-qty').value = currentQty;
+            appState.ticketQuantity = currentQty;
+        }
+
+        function verifyCaptchaAndProceed() {
+            if (appState.captchaSolved) {
+                // 親子套票確認勾選
+                if (appState.selectedArea.includes('親子套票')) {
+                    const familyCheck = document.getElementById('family-agree').checked;
+                    if (!familyCheck) {
+                        showModal('warning', '確認套票規範', '您必須勾選並同意親子套票及長者驗證進場規範，方可進行購票。');
+                        return;
+                    }
+                }
+                goToStep(3);
+            }
+        }
+
+        // 步驟 3: 設定訂單資料與持票人欄位
+        function setupStep3Details() {
+            document.getElementById('step-3-area-display').innerText = appState.selectedArea;
+            document.getElementById('step-3-single-price-display').innerText = `NT$ ${appState.selectedPrice.toLocaleString()}`;
+            document.getElementById('step-3-qty-display').innerText = `${appState.ticketQuantity} 張`;
+            
+            const total = appState.selectedPrice * appState.ticketQuantity;
+            document.getElementById('step-3-total-price').innerText = `NT$ ${total.toLocaleString()}`;
+
+            const container = document.getElementById('buyer-forms-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= appState.ticketQuantity; i++) {
+                const formHtml = `
+                    <div class="bg-mayblue-950 p-5 rounded-xl border border-mayblue-800 space-y-3">
+                        <span class="text-xs font-bold text-esun-500 block"><i class="fa-solid fa-user-pen mr-1"></i> 第 ${i} 位實名制持票人</span>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">真實姓名 (須與證件完全一致)</label>
+                                <input type="text" id="buyer-name-${i}" placeholder="例：陳信宏" class="w-full bg-mayblue-900 border border-mayblue-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-esun-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1">身分證字號 / 護照號碼 (入場查驗)</label>
+                                <input type="text" id="buyer-id-${i}" placeholder="例：A123456789" class="w-full bg-mayblue-900 border border-mayblue-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-esun-500 uppercase">
+                            </div>
                         </div>
                     </div>
                 `;
-            }).join('');
-            
-            sidebarNav.innerHTML = itemsHtml + dayItemsHtml;
+                container.insertAdjacentHTML('beforeend', formHtml);
+            }
         }
 
-        function switchDay(dayNum) {
-            const contentDiv = document.getElementById('itinerary-content');
-            const header = document.getElementById('main-header');
+        // 10分鐘保留計時器
+        function startReservationTimer() {
+            if (appState.reservationTimer) {
+                clearInterval(appState.reservationTimer);
+            }
             
-            // 1. 重設所有側邊欄項目為非活躍狀態
-            document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+            appState.reservationTimeRemaining = 600; 
+            const timerEl = document.getElementById('reservation-timer');
 
-            // 2. 處理 Day 0 (回到首頁) 邏輯
-            if (dayNum === 0) {
-                // 顯示封面標題元素
-                document.getElementById('main-title').classList.remove('hidden-content');
-                document.getElementById('sub-title').classList.remove('hidden-content');
+            appState.reservationTimer = setInterval(() => {
+                appState.reservationTimeRemaining--;
                 
-                // 移除緊湊型日曆標題
-                const existingCompact = document.getElementById('day-header-compact');
-                if (existingCompact) existingCompact.remove();
-
-                if(header) {
-                    // 讓 Header 執行 In 動畫
-                    header.style.animation = 'headerFadeIn 0.5s ease-out forwards';
-                    header.style.pointerEvents = 'auto'; // 確保可以點擊
+                if (appState.reservationTimeRemaining <= 0) {
+                    clearInterval(appState.reservationTimer);
+                    showModal('error', '訂單保留已逾時', '您的座位保留時間已結束。座位已自動釋回拓元系統。');
+                    switchTab('home');
+                    return;
                 }
-                contentDiv.classList.remove('show');
-                contentDiv.style.display = 'none';
-                contentDiv.innerHTML = '';
-                const homeItem = document.getElementById('sidebar-item-home');
-                if (homeItem) homeItem.classList.add('active');
+
+                const mins = Math.floor(appState.reservationTimeRemaining / 60);
+                const secs = appState.reservationTimeRemaining % 60;
+                timerEl.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // 提交確認訂單
+        function submitOrder() {
+            const agree = document.getElementById('agree-terms').checked;
+            if (!agree) {
+                showModal('warning', '請同意購票與退票規範', '您必須勾選確認同意本場演唱會的所有注意事項、視線瑕疵區公告及退票規範。');
+                return;
+            }
+
+            const buyers = [];
+            for (let i = 1; i <= appState.ticketQuantity; i++) {
+                const nameVal = document.getElementById(`buyer-name-${i}`).value.trim();
+                const idVal = document.getElementById(`buyer-id-${i}`).value.trim().toUpperCase();
+
+                if (!nameVal || !idVal) {
+                    showModal('warning', '實名資料未填', `請確實填寫第 ${i} 位持票人的實名制資料。`);
+                    return;
+                }
+
+                if (idVal.length < 5) {
+                    showModal('warning', '身份證格式不全', `請填寫第 ${i} 位持票人正確有效的身份證號或護照識別碼。`);
+                    return;
+                }
+
+                buyers.push({ name: nameVal, id: idVal });
+            }
+
+            if (appState.reservationTimer) {
+                clearInterval(appState.reservationTimer);
+            }
+
+            const randomId = Math.floor(100000 + Math.random() * 900000);
+            const orderId = `TXC-${randomId}-MD`;
+
+            const newTicket = {
+                orderId: orderId,
+                session: appState.selectedSession,
+                time: appState.selectedTime,
+                area: appState.selectedArea,
+                price: appState.selectedPrice,
+                qty: appState.ticketQuantity,
+                buyers: buyers,
+                purchaseTime: new Date().toLocaleString()
+            };
+
+            appState.orders.push(newTicket);
+            saveTicketsToLocal();
+            updateTicketBadge();
+
+            // 設定成功頁面顯示
+            document.getElementById('success-date').innerText = appState.selectedSession;
+            document.getElementById('success-time').innerText = `${appState.selectedTime} 開演`;
+            document.getElementById('success-area').innerText = appState.selectedArea;
+            document.getElementById('success-qty').innerText = `${appState.ticketQuantity} 張`;
+            document.getElementById('success-order-id').innerText = orderId;
+
+            const successList = document.getElementById('success-buyers-list');
+            successList.innerHTML = '';
+            buyers.forEach((b, idx) => {
+                successList.insertAdjacentHTML('beforeend', `
+                    <div class="flex justify-between text-slate-300 font-mono">
+                        <span>持票人 ${idx + 1}: ${b.name}</span>
+                        <span class="text-esun-500">${maskId(b.id)}</span>
+                    </div>
+                `);
+            });
+
+            switchTab('success');
+        }
+
+        // 渲染電子票夾
+        function renderTicketsWallet() {
+            const emptyView = document.getElementById('no-tickets-view');
+            const listContainer = document.getElementById('tickets-list-container');
+            
+            if (appState.orders.length === 0) {
+                emptyView.classList.remove('hidden');
+                listContainer.classList.add('hidden');
             } else {
-                // 處理一般日期行程 (Day 1, 2, ...) 邏輯
-                const dayData = itineraryData.find((d, i) => i + 1 === dayNum);
+                emptyView.classList.add('hidden');
+                listContainer.classList.remove('hidden');
                 
-                if (dayData) {
-                    // 立即渲染緊湊型標題，佔據空間並提供主題資訊
-                    renderDayHeader(dayData);
+                listContainer.innerHTML = '';
+                appState.orders.forEach(order => {
+                    let buyersHtml = '';
+                    order.buyers.forEach((b, idx) => {
+                        buyersHtml += `
+                            <div class="flex justify-between text-xs text-slate-300 font-mono">
+                                <span>持票人 ${idx + 1}: ${b.name}</span>
+                                <span class="text-esun-500">${maskId(b.id)}</span>
+                            </div>
+                        `;
+                    });
 
-                    // 確保內容區在切換前隱藏，以便動畫重新開始
-                    contentDiv.classList.remove('show');
-                    contentDiv.style.display = 'none';
-                    
-                    const activeItem = document.getElementById(`sidebar-item-${dayNum}`);
-                    if (activeItem) activeItem.classList.add('active');
-                    
-                    // 延遲渲染行程細節，讓標題動畫有時間完成
-                    setTimeout(() => {
-                        contentDiv.style.display = 'block';
-                        renderItinerary(dayData);
-                        
-                        // 滾動到內容區頂部，但不要完全頂著
-                        window.scrollTo({ top: contentDiv.offsetTop - 100, behavior: 'smooth' });
-                    }, 50); 
-                }
+                    const cardHtml = `
+                        <div class="bg-gradient-to-br from-[#0a233a] to-[#031525] border border-esun-500/20 rounded-2xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between min-h-[260px] group hover:border-esun-500 transition duration-300">
+                            <div class="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-esun-500 to-mayblue-400"></div>
+                            
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <span class="text-[9px] font-bold text-esun-500 uppercase tracking-widest block">Mayday #5525+2</span>
+                                    <h4 class="text-sm font-black text-white group-hover:text-esun-500 transition-colors">回到那一天 巡迴演唱會</h4>
+                                </div>
+                                <span class="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold font-mono">
+                                    電子票待查驗
+                                </span>
+                            </div>
+
+                            <div class="space-y-2 border-t border-mayblue-900 pt-3">
+                                <div class="grid grid-cols-2 gap-2 text-xs">
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block">演出場次 / 時間</span>
+                                        <span class="font-bold text-slate-200 font-mono">${order.session} ${order.time}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-slate-500 text-[10px] block">座位分區</span>
+                                        <span class="font-bold text-esun-500">${order.area}</span>
+                                    </div>
+                                </div>
+                                <div class="pt-2 border-t border-dashed border-mayblue-900 space-y-1">
+                                    <span class="text-slate-500 text-[10px] block">實名登記名單</span>
+                                    ${buyersHtml}
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-mayblue-900 flex items-center justify-between">
+                                <div>
+                                    <span class="text-[9px] text-slate-500 uppercase">Order ID</span>
+                                    <span class="text-xs font-mono font-bold text-slate-300 block">${order.orderId}</span>
+                                </div>
+                                <div class="bg-white p-1 rounded-lg">
+                                    <div class="w-8 h-8 bg-slate-900 rounded flex items-center justify-center relative overflow-hidden">
+                                        <i class="fa-solid fa-qrcode text-2xl text-white"></i>
+                                        <div class="absolute w-full h-[1px] bg-esun-500 top-0 left-0 animate-[bounce_1.5s_infinite]"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    listContainer.insertAdjacentHTML('beforeend', cardHtml);
+                });
             }
-            
-            currentDay = dayNum;
-            // 確保每次切換後都能重新觸發滾動邏輯
-            handleScroll();
         }
 
-        // =================================================================
-        // 4. 楓葉特效 (保持不變)
-        // =================================================================
-        function createMapleLeaf() {
-            const container = document.getElementById('maple-fall-container');
-            if(!container) return;
-            const leaf = document.createElement('div');
-            leaf.className = 'maple-leaf';
-            leaf.style.left = Math.random() * 100 + 'vw';
-            const size = 10 + Math.random() * 15;
-            leaf.style.width = size + 'px';
-            leaf.style.height = size + 'px';
-            leaf.style.backgroundColor = ['#e53e3e', '#dd6b20', '#f6ad55', '#fed7d7'][Math.floor(Math.random() * 4)];
-            
-            const duration = 10 + Math.random() * 10;
-            leaf.style.animationDuration = duration + 's';
-            leaf.style.animationName = 'fall' + Math.floor(Math.random() * 2);
-            
-            container.appendChild(leaf);
-            setTimeout(() => leaf.remove(), duration * 1000);
-        }
-
-        function startMapleFall() {
-            // 讓初始飄落的楓葉更多
-            for (let i = 0; i < 50; i++) setTimeout(createMapleLeaf, Math.random() * 5000); 
-            // 增加持續生成速度
-            setInterval(() => {
-                const count = Math.floor(Math.random() * 5) + 3; // 3 to 7 leaves
-                for(let i=0; i<count; i++) createMapleLeaf();
-            }, 500);
-        }
-
-        // 【升級 2】處理滾動事件，讓頂部導航欄縮放，並控制主標題淡入淡出
-        function handleScroll() {
-            const sidebar = document.getElementById('sidebar');
-            const header = document.getElementById('main-header');
-            const scrollTop = window.scrollY;
-            const scrollThreshold = 100; // 滾動超過 100px 開始變化
-
-            // 1. 導航欄緊湊模式
-            if (scrollTop > 50) { // 稍微降低觸發點，讓導航欄更快縮小
-                sidebar.classList.add('compact');
+        // 輔助函式
+        function updateTicketBadge() {
+            const badge = document.getElementById('ticket-badge');
+            const count = appState.orders.length;
+            if (count > 0) {
+                badge.innerText = count;
+                badge.classList.remove('hidden');
             } else {
-                sidebar.classList.remove('compact');
+                badge.classList.add('hidden');
+            }
+        }
+
+        function maskId(idString) {
+            if (idString.length < 5) return idString;
+            return idString.substring(0, 3) + "****" + idString.substring(7);
+        }
+
+        function saveTicketsToLocal() {
+            try {
+                localStorage.setItem('mayday_tickets_official_demo', JSON.stringify(appState.orders));
+            } catch (e) {
+                console.error("無法存檔:", e);
+            }
+        }
+
+        function loadSavedTickets() {
+            try {
+                const saved = localStorage.getItem('mayday_tickets_official_demo');
+                if (saved) {
+                    appState.orders = JSON.parse(saved);
+                    updateTicketBadge();
+                }
+            } catch (e) {
+                console.error("無法載入票卡:", e);
+            }
+        }
+
+        // 彈出式訊息美化框控制
+        function showModal(type, title, message) {
+            const modal = document.getElementById('custom-modal');
+            const titleEl = document.getElementById('modal-title');
+            const msgEl = document.getElementById('modal-message');
+            const iconContainer = document.getElementById('modal-icon-container');
+            const btn = document.getElementById('modal-btn');
+
+            titleEl.innerText = title;
+            msgEl.innerText = message;
+
+            iconContainer.className = "mx-auto h-12 w-12 rounded-full flex items-center justify-center text-2xl";
+            if (type === 'success') {
+                iconContainer.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/20');
+                iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                btn.className = "w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-sm transition";
+            } else if (type === 'warning') {
+                iconContainer.classList.add('bg-amber-500/10', 'text-amber-400', 'border', 'border-amber-500/20');
+                iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                btn.className = "w-full bg-amber-600 hover:bg-amber-500 text-white font-bold py-2 rounded-lg text-sm transition";
+            } else if (type === 'error') {
+                iconContainer.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/20');
+                iconContainer.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i>';
+                btn.className = "w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-2 rounded-lg text-sm transition";
             }
 
-            // 2. 主標題淡出/淡入控制
-            // 注意：只有在首頁 (currentDay === 0) 才會有淡出效果
-            if (header && currentDay === 0) { 
-                if (scrollTop > scrollThreshold) {
-                    // 向下滾動超過門檻，淡出主標題
-                    header.style.opacity = '0';
-                    header.style.transform = 'translateY(-30px)';
-                    header.style.pointerEvents = 'none';
-                } else {
-                    // 向上滾動或在頂部，淡入主標題
-                    const opacity = 1 - (scrollTop / scrollThreshold);
-                    header.style.opacity = Math.max(0, opacity);
-                    header.style.transform = `translateY(${(-scrollTop / 3)}px)`; // 輕微視差效果
-                    header.style.pointerEvents = 'auto';
-                }
-            }
-
-            lastScrollTop = scrollTop;
+            modal.classList.remove('hidden');
         }
 
-        // =================================================================
-        // 6. 客製化 Modal 函式
-        // =================================================================
-        function showKobeModal() {
-            const modal = document.getElementById('kobe-modal');
-            modal.classList.add('show');
+        function closeModal() {
+            document.getElementById('custom-modal').classList.add('hidden');
         }
-
-        function hideKobeModal() {
-            const modal = document.getElementById('kobe-modal');
-            modal.classList.remove('show');
-        }
-
-        function navigateToKobe() {
-            hideKobeModal();
-            // 使用 window.open 在新分頁開啟連結
-            window.open('https://xyuan0788.github.io/JP25/kobe.html', '_blank');
-        }
-
-
-        // =================================================================
-        // 5. 初始化 (Initialize)
-        // =================================================================
-        function initializeApp() {
-            renderSidebar();
-            startMapleFall();
-            
-            // 【新增】滾動監聽器
-            window.addEventListener('scroll', handleScroll);
-
-            // --- 標題動畫設定區塊 ---
-            const mainTitleText = "2025 大阪楓年祭<br>散策旅圖";
-            const subTitleText = "我好想好想飛 🍁 逃進那個楓狂世界";
-            
-            // 應用字符漂浮動畫 (主標題, 重複漂浮)
-            applyCharacterAnimation('main-title', mainTitleText, 'charFloat', 0.15, '4s', 'infinite');
-            
-            // 應用字符滑動動畫 (副標題, 只執行一次 slide-in)
-            applyCharacterAnimation('sub-title', subTitleText, 'charSlideUp', 0.05, '0.8s', 'forwards');
-            
-            // 載入時預設顯示首頁 (Day 0)
-            if (itineraryData.length > 0) {
-                setTimeout(() => switchDay(0), 50); 
-            }
-
-            // 確保楓葉的 CSS 設置
-            const mapleStyleSheet = document.createElement("style");
-            mapleStyleSheet.innerText = `
-                :root { --wind-x: 5vw; } 
-                @keyframes fall0 {
-                    0% { transform: translateY(-10vh) rotateZ(0deg); opacity: 0; }
-                    10% { opacity: 1; }
-                    100% { transform: translateY(105vh) translateX(var(--wind-x)) rotateZ(720deg); opacity: 0; }
-                }
-                @keyframes fall1 {
-                    0% { transform: translateY(-10vh) rotateZ(180deg); opacity: 0; }
-                    10% { opacity: 1; }
-                    100% { transform: translateY(105vh) translateX(calc(var(--wind-x) * -0.5)) rotateZ(900deg); opacity: 0; } 
-                }
-            `;
-            document.head.appendChild(mapleStyleSheet);
-        }
-
-        // Run when DOM is ready
-        document.addEventListener('DOMContentLoaded', initializeApp);
-
     </script>
 </body>
-
 </html>
